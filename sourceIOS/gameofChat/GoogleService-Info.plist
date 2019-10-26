@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>177610722720-gpi2pjkost28c92d1e990da2tt7r0s1r.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.177610722720-gpi2pjkost28c92d1e990da2tt7r0s1r</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBlwYA-QSBcGqyGGAerhML6am5wjUK05b4</string>
+	<key>GCM_SENDER_ID</key>
+	<string>177610722720</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>kt.com.gameofChat</string>
+	<key>PROJECT_ID</key>
+	<string>gameofchat-c8007</string>
+	<key>STORAGE_BUCKET</key>
+	<string>gameofchat-c8007.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:177610722720:ios:0f9ecdd8eb64e606</string>
+	<key>DATABASE_URL</key>
+	<string>https://gameofchat-c8007.firebaseio.com</string>
+</dict>
+</plist>

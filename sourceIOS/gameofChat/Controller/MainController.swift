@@ -38,7 +38,7 @@ class MainController: UITabBarController {
 		let itemHistory = UITabBarItem()
 		itemHistory.title = "History"
 		itemHistory.image = UIImage(named: "home_icon")
-		let historyVC = HistoryController()
+		let historyVC:UIViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier:"HistoryController") as UIViewController
 		historyVC.tabBarItem = itemHistory
 
 

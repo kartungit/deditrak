@@ -203,7 +203,8 @@ class HistoryController: UIViewController, UITableViewDataSource, UITableViewDel
 									return message1.timestamp!.intValue > message2.timestamp!.intValue
 								})
 							}
-							else{
+							else if (distance > 0){
+								// exclude all items in today
 								self.lastMonthItems.append(item)
 								self.lastMonthItems.sort(by: { (message1, message2) -> Bool in
 									return message1.timestamp!.intValue > message2.timestamp!.intValue

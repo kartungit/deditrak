@@ -14,11 +14,12 @@ class MainController: UITabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+		checkIfUserLoggedIn()
+
     }
 
 	override func viewDidAppear(_ animated: Bool) {
 		super .viewDidAppear(animated)
-		checkIfUserLoggedIn()
 	}
 
 	func setupTabBarItems(){

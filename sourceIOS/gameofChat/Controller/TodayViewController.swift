@@ -14,6 +14,7 @@ class TodayViewController: UIViewController,ItemProtocol {
 	lazy var  segmentioView = Segmentio()
 	lazy var  containerView = UIView()
 	lazy var  scrollView = UIScrollView()
+	var currentTab = 0
 
 	private lazy var viewControllers: [MessageController] = {
 		return [MessageController(with: "New"),MessageController(with: "In Progress"),MessageController(with: "Recieved"),MessageController(with: "Deliveried")]
@@ -63,7 +64,7 @@ class TodayViewController: UIViewController,ItemProtocol {
 				)
 			}
 		}
-		segmentioView.selectedSegmentioIndex = selectedSegmentioIndex()
+		segmentioView.selectedSegmentioIndex = self.currentTab
 
 
 	}
@@ -88,6 +89,7 @@ class TodayViewController: UIViewController,ItemProtocol {
 		let chatLogController = ChatLogController(collectionViewLayout: UICollectionViewFlowLayout())
 		chatLogController.user = user
 		self.tabBarController?.navigationController?.pushViewController(chatLogController, animated: true)
+		
 	}
 
 	func setupSegmentsViewConstraints(){
@@ -191,6 +193,8 @@ extension TodayViewController: UIScrollViewDelegate {
 	func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
 		let currentPage = floor(scrollView.contentOffset.x / scrollView.frame.width)
 		segmentioView.selectedSegmentioIndex = Int(currentPage)
+		self.currentTab = Int(currentPage)
+
 	}
 
 	func scrollViewDidScroll(_ scrollView: UIScrollView) {

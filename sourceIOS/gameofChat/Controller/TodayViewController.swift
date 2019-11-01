@@ -30,8 +30,6 @@ class TodayViewController: UIViewController,ItemProtocol {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-
-
 		let imageButtonView = UIImageView(image: UIImage(named: "add"))
 		imageButtonView.frame = CGRect(x: 0, y: 0, width: 36, height: 36)
 		let rightButtonView = UIView()
@@ -40,7 +38,6 @@ class TodayViewController: UIViewController,ItemProtocol {
 		let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleNewItem))
 		rightButtonView.addGestureRecognizer(tapGesture)
 		self.tabBarController?.navigationItem.rightBarButtonItem =  UIBarButtonItem(customView: rightButtonView)
-
 
 		view.backgroundColor = UIColor.white
 		setupSegmentsViewConstraints()
@@ -142,7 +139,6 @@ class TodayViewController: UIViewController,ItemProtocol {
 		scrollView.isPagingEnabled = true
 		scrollView.showsHorizontalScrollIndicator = false
 		scrollView.isMultipleTouchEnabled = true
-
 	}
 
 	private static func segmentioStates() -> SegmentioStates {
@@ -167,7 +163,6 @@ class TodayViewController: UIViewController,ItemProtocol {
 	}
 
 	struct ColorPalette {
-
 		static let white = UIColor(r: 255, g: 255, b: 255)
 		static let black = UIColor(r: 3, g: 3, b: 3)
 		static let coral = UIColor(r: 244, g: 111, b: 96)
@@ -183,15 +178,6 @@ class TodayViewController: UIViewController,ItemProtocol {
 		)
 	}
 
-	private static func segmentioIndicatorOptions() -> SegmentioIndicatorOptions {
-		return SegmentioIndicatorOptions(
-			type: .bottom,
-			ratio: 1,
-			height: 5,
-			color: ColorPalette.coral
-		)
-	}
-
 	private static func segmentioHorizontalSeparatorOptions() -> SegmentioHorizontalSeparatorOptions {
 		return SegmentioHorizontalSeparatorOptions(
 			type: .topAndBottom,
@@ -199,14 +185,6 @@ class TodayViewController: UIViewController,ItemProtocol {
 			color: ColorPalette.whiteSmoke
 		)
 	}
-
-	private static func segmentioVerticalSeparatorOptions() -> SegmentioVerticalSeparatorOptions {
-		return SegmentioVerticalSeparatorOptions(
-			ratio: 1,
-			color: ColorPalette.whiteSmoke
-		)
-	}
-
 }
 extension TodayViewController: UIScrollViewDelegate {
 

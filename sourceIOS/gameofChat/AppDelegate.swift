@@ -13,7 +13,7 @@ import Firebase
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
 	var window: UIWindow?
-
+	var userInfo: User!
 
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
@@ -23,6 +23,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		window?.makeKeyAndVisible()
 
 		window?.rootViewController = UINavigationController(rootViewController: MainController())
+
+		self.fetchUserAndSetupNavbarTitle()
+
 		return true
 	}
 
@@ -48,6 +51,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		// Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 	}
 
+	fileprivate func fetchUserAndSetupNavbarTitle() {
+		let uid = Auth.auth().currentUser?.uid
+		Database.database().reference().child("users").child(uid!).observeSingleEvent(of: .value) { (snapshot) in
+			if let user = User.bindingUserFrom(snapshot: snapshot){
+				self.userInfo = user
+			}
+		}
+	}
 
 }
 

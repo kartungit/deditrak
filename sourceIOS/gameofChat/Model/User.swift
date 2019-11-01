@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import FirebaseDatabase
 
 class User: NSObject {
 	var id: String?
@@ -14,4 +15,15 @@ class User: NSObject {
 	var name: String?
 	var email: String?
 	var profileImageUrl: String?
+
+	static func bindingUserFrom(snapshot: DataSnapshot) -> User? {
+		let user = User()
+		if let dictionary = snapshot.value as? [String: Any] {
+			user.office = dictionary["office"] as? String
+			user.id = dictionary["id"] as? String
+			user.email = dictionary["email"] as? String
+			user.name = dictionary["name"] as? String
+		}
+		return user
+	}
 }

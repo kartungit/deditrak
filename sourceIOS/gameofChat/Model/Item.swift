@@ -21,4 +21,21 @@ class Item: NSObject {
 	var reciever: String?
 	var sender: String?
 	var status: String?
+
+	static func createTestItem() -> Item{
+		let item : Item = Item()
+		item.itemId = "1abc"
+		item.fromId = "2abc"
+		item.timestamp = Date().timeIntervalSinceNow as NSNumber
+		item.toId = "3abc"
+		item.title = "Hello"
+		item.category = "Paper"
+		item.fromOffice = "Cong Hoa"
+		item.toOffice = "Truong Son"
+		item.quantity = "1"
+		item.reciever = "Huy"
+		item.sender = "Nga"
+		item.status = "New"
+		return item
+	}
 }

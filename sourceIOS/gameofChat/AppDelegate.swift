@@ -52,10 +52,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 
 	fileprivate func fetchUserAndSetupNavbarTitle() {
-		let uid = Auth.auth().currentUser?.uid
-		Database.database().reference().child("users").child(uid!).observeSingleEvent(of: .value) { (snapshot) in
-			if let user = User.bindingUserFrom(snapshot: snapshot){
-				self.userInfo = user
+		if let uid = Auth.auth().currentUser?.uid {
+			Database.database().reference().child("users").child(uid).observeSingleEvent(of: .value) { (snapshot) in
+				if let user = User.bindingUserFrom(snapshot: snapshot){
+					self.userInfo = user
+				}
 			}
 		}
 	}

@@ -27,7 +27,6 @@ class ItemCell: UITableViewCell {
 			titleLabel.text = item.title
 			categoryLabel.text = "Quantity: \(String(describing: item.quantity!))"
 			statusLabel.text = item.status
-			statusLabel.textColor = getStatusColor(status: item.status)
 			renderOfficeLable(label: fromOfficeLabel, text: item.fromOffice!)
 			renderOfficeLable(label: toOfficeLabel, text: item.toOffice!)
 			senderRecieverLabel.text = "\(String(describing: item.sender!)) to \(String(describing: item.reciever!))"
@@ -99,13 +98,6 @@ class ItemCell: UITableViewCell {
 		return label
 	}()
 
-	let peopleImageView: UIImageView = {
-		let imageView = UIImageView(image: UIImage(named: "people"))
-		imageView.contentMode = .scaleAspectFill
-		imageView.translatesAutoresizingMaskIntoConstraints = false
-		return imageView
-	}()
-
 	let senderRecieverLabel: UILabel = {
 		let label = UILabel()
 		label.font = UIFont.systemFont(ofSize: 16)
@@ -124,8 +116,8 @@ class ItemCell: UITableViewCell {
 
 	let nextButton: ButtonExtended = {
 		let button = ButtonExtended()
-		button.backgroundColor = UIColor(r: 5, g: 10, b: 200)
-		button.setTitle("Next", for: .normal)
+//		button.backgroundColor = UIColor(r: 5, g: 10, b: 200)
+//		button.setTitle("Next", for: .normal)
 		button.translatesAutoresizingMaskIntoConstraints = false
 		return button
 	}()
@@ -177,7 +169,6 @@ class ItemCell: UITableViewCell {
 		addSubview(titleLabel)
 		addSubview(categoryLabel)
 		addSubview(senderRecieverLabel)
-		addSubview(peopleImageView)
 		addSubview(nextButton)
 		self.setupOfficesView()
 
@@ -187,7 +178,7 @@ class ItemCell: UITableViewCell {
 		titleLabel.rightAnchor.constraint(equalTo: nextButton.leftAnchor,constant: -4).isActive = true
 		titleLabel.topAnchor.constraint(equalTo: timeLabel.bottomAnchor, constant: 2).isActive = true
 
-		timeLabel.rightAnchor.constraint(equalTo: nextButton.leftAnchor, constant: -4).isActive = true
+		timeLabel.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -4).isActive = true
 		timeLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: 4).isActive = true
 		timeLabel.widthAnchor.constraint(equalToConstant: 200).isActive = true
 		timeLabel.heightAnchor.constraint(equalToConstant: 23).isActive = true
@@ -197,13 +188,8 @@ class ItemCell: UITableViewCell {
 		categoryLabel.leftAnchor.constraint(equalTo: titleLabel.leftAnchor).isActive = true
 		categoryLabel.rightAnchor.constraint(equalTo: titleLabel.rightAnchor).isActive = true
 
-		peopleImageView.leftAnchor.constraint(equalTo: categoryLabel.leftAnchor).isActive = true
-		peopleImageView.topAnchor.constraint(equalTo: categoryLabel.bottomAnchor, constant: 8).isActive = true
-		peopleImageView.widthAnchor.constraint(equalToConstant: 32).isActive = true
-		peopleImageView.heightAnchor.constraint(equalToConstant: 32).isActive = true
-
-		senderRecieverLabel.centerYAnchor.constraint(equalTo: peopleImageView.centerYAnchor).isActive = true
-		senderRecieverLabel.leftAnchor.constraint(equalTo: peopleImageView.rightAnchor).isActive = true
+		senderRecieverLabel.topAnchor.constraint(equalTo: categoryLabel.bottomAnchor, constant: 8).isActive = true
+		senderRecieverLabel.leftAnchor.constraint(equalTo: categoryLabel.leftAnchor).isActive = true
 		senderRecieverLabel.rightAnchor.constraint(equalTo: categoryLabel.rightAnchor).isActive = true
 
 		statusLabel.leftAnchor.constraint(equalTo: officesView.leftAnchor).isActive = true
@@ -218,30 +204,32 @@ class ItemCell: UITableViewCell {
 
 	func setupNextButton(){
 		// TODO : add more logic for visibility of the button
-		nextButton.rightAnchor.constraint(equalTo: self.rightAnchor).isActive = true
-		nextButton.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
-		nextButton.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
+		nextButton.rightAnchor.constraint(equalTo: self.rightAnchor,constant: -16).isActive = true
+		nextButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
+		nextButton.topAnchor.constraint(equalTo: self.timeLabel.bottomAnchor, constant: 8).isActive = true
 		widthConstraint.isActive = true
 		widthConstraint.constant = hideNext ? 0 : 60
 		nextButton.isHidden = hideNext
+		nextButton.setImage(self.getStatusIcon(status: item?.status), for: .normal)
+		nextButton.imageView?.contentMode = .scaleAspectFit
 
 	}
 
-	func getStatusColor(status: String?) -> UIColor{
+	func getStatusIcon(status: String?) -> UIImage?{
 			guard let currentStatus = status else {
-				return UIColor.black
+				return UIImage(named: "new")
 			}
 			switch currentStatus {
 			case "New":
-				return UIColor(r: 0, g: 62, b: 6)
+				return UIImage(named: "in_progress")
 			case "In Progress":
-				return UIColor(r: 22, g: 46, b: 11)
+				return UIImage(named: "recieved")
 			case "Recieved":
-				return UIColor(r: 3, g: 33, b: 58)
+				return UIImage(named: "delivered")
 			case "Deliveried":
-				return UIColor(r: 17, g: 47, b: 89)
+				return UIImage(named: "delivered")
 			default:
-				return UIColor.black
+				return UIImage(named: "new")
 			}
 	}
 	required init?(coder aDecoder: NSCoder) {

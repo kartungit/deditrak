@@ -56,7 +56,20 @@ class MessageController: UITableViewController {
 			let itemId = snapshot.key
 			if let item = self.bindingItemFrom(snapshot: snapshot){
 				if let index = self.message.firstIndex (where: {$0.itemId == itemId}) {
-					self.message[index] = item
+					 if (item.status != self.baseStatus) {
+						// edit status item, remove item at current status
+						self.message.remove(at: index)
+					} else {
+						// edit item's properties
+						self.message[index] = item
+					}
+				}
+				if (item.status == self.baseStatus) {
+					// edit status item, add item to next status
+					self.message.append(item)
+					self.message.sort(by: { (message1, message2) -> Bool in
+						return message1.timestamp!.intValue > message2.timestamp!.intValue
+					})
 				}
 			}
 			DispatchQueue.main.async {

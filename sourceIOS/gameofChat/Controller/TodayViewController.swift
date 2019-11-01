@@ -9,14 +9,14 @@
 import UIKit
 import Segmentio
 
-class TodayViewController: UIViewController {
+class TodayViewController: UIViewController,ItemProtocol {
 
 	lazy var  segmentioView = Segmentio()
 	lazy var  containerView = UIView()
 	lazy var  scrollView = UIScrollView()
 
 	private lazy var viewControllers: [UIViewController] = {
-		return [SettingController(),SettingController()]
+		return [MessageController(),MessageController()]
 	}()
 
 	private func segmentioContent() -> [SegmentioItem] {
@@ -26,11 +26,20 @@ class TodayViewController: UIViewController {
 		]
 	}
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+	override func viewDidLoad() {
+		super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
-    }
+
+		let imageButtonView = UIImageView(image: UIImage(named: "add"))
+		imageButtonView.frame = CGRect(x: 0, y: 0, width: 36, height: 36)
+		let rightButtonView = UIView()
+		rightButtonView.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
+		rightButtonView.addSubview(imageButtonView)
+		let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleNewItem))
+		rightButtonView.addGestureRecognizer(tapGesture)
+		self.tabBarController?.navigationItem.rightBarButtonItem =  UIBarButtonItem(customView: rightButtonView)
+
+	}
 	override func viewDidAppear(_ animated: Bool) {
 		super .viewDidAppear(animated)
 		setupSegmentsViewConstraints()
@@ -53,6 +62,17 @@ class TodayViewController: UIViewController {
 				)
 			}
 		}
+
+	}
+
+	@objc func handleNewItem(){
+		createNewItem(user: nil)
+	}
+
+	func createNewItem(user: User?) {
+		let chatLogController = ChatLogController(collectionViewLayout: UICollectionViewFlowLayout())
+		chatLogController.user = user
+		self.tabBarController?.navigationController?.pushViewController(chatLogController, animated: true)
 	}
 
 	private func setupScrollView() {

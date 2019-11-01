@@ -13,7 +13,7 @@ import FirebaseDatabase
 protocol ItemProtocol {
 	func createNewItem(user: User?)
 }
-class MessageController: UITableViewController,ItemProtocol {
+class MessageController: UITableViewController {
 
 
 	let cellId = "cellId"
@@ -23,15 +23,6 @@ class MessageController: UITableViewController,ItemProtocol {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-
-		let imageButtonView = UIImageView(image: UIImage(named: "add"))
-		imageButtonView.frame = CGRect(x: 0, y: 0, width: 36, height: 36)
-		let rightButtonView = UIView()
-		rightButtonView.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
-		rightButtonView.addSubview(imageButtonView)
-		let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleNewItem))
-		rightButtonView.addGestureRecognizer(tapGesture)
-		self.tabBarController?.navigationItem.rightBarButtonItem =  UIBarButtonItem(customView: rightButtonView)
 
 		tableView.register(ItemCell.self, forCellReuseIdentifier: cellId)
 		observeMessages()
@@ -186,17 +177,6 @@ class MessageController: UITableViewController,ItemProtocol {
 		self.tabBarController?.navigationController?.pushViewController(chatLogController, animated: true)
 	}
 
-	func createNewItem(user: User?) {
-
-		let chatLogController = ChatLogController(collectionViewLayout: UICollectionViewFlowLayout())
-		chatLogController.user = user
-		self.tabBarController?.navigationController?.pushViewController(chatLogController, animated: true)
-	}
-
-	@objc func handleNewItem(){
-		createNewItem(user: nil) 
-
-	}
 	fileprivate func setupNavigationTitleView(user: User) {
 
 		message.removeAll()

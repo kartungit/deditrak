@@ -20,7 +20,18 @@ class MessageController: UITableViewController {
 	var message = [Item]()
 	var messageDictionary = [String: Message]()
 	var userInfo: User!
+	var positionView = 0
+	var baseStatus: String?
 
+	init(with status: String) {
+		self.baseStatus = status
+		super.init(nibName: nil, bundle: nil)
+	}
+
+	public required init?(coder aDecoder: NSCoder) {
+		super.init(coder: aDecoder)
+		self.baseStatus = nil
+	}
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
@@ -31,7 +42,9 @@ class MessageController: UITableViewController {
 	override func viewDidAppear(_ animated: Bool) {
 		super .viewDidAppear(animated)
 		checkIfUserLoggedIn()
-		
+		self.tableView.backgroundColor = UIColor.white
+		self.tableView.frame = CGRect(x: CGFloat(positionView) * UIScreen.main.bounds.width, y: 0, width: UIScreen.main.bounds.width, height: self.view.frame.height)
+
 	}
 
 	func observeMessages(){
@@ -101,11 +114,12 @@ class MessageController: UITableViewController {
 				messageReference.observeSingleEvent(of: .value, with: { (snapshot) in
 					if let item = self.bindingItemFrom(snapshot: snapshot){
 						if item.timestamp != nil {
-							self.message.append(item)
-							self.message.sort(by: { (message1, message2) -> Bool in
-								return message1.timestamp!.intValue > message2.timestamp!.intValue
-							})
-
+							if self.baseStatus == item.status {
+								self.message.append(item)
+								self.message.sort(by: { (message1, message2) -> Bool in
+									return message1.timestamp!.intValue > message2.timestamp!.intValue
+								})
+							}
 						}
 						DispatchQueue.main.async {
 							self.tableView.reloadData()

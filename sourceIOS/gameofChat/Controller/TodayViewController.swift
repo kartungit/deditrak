@@ -15,14 +15,16 @@ class TodayViewController: UIViewController,ItemProtocol {
 	lazy var  containerView = UIView()
 	lazy var  scrollView = UIScrollView()
 
-	private lazy var viewControllers: [UIViewController] = {
-		return [MessageController(),MessageController()]
+	private lazy var viewControllers: [MessageController] = {
+		return [MessageController(with: "New"),MessageController(with: "In Progress"),MessageController(with: "Recieved"),MessageController(with: "Deliveried")]
 	}()
 
 	private func segmentioContent() -> [SegmentioItem] {
 		return [
-			SegmentioItem(title: "Tornado", image: UIImage(named: "tornado")),
-			SegmentioItem(title: "Earthquakes", image: UIImage(named: "earthquakes"))
+			SegmentioItem(title: "New", image: UIImage(named: "new")),
+			SegmentioItem(title: "In Progress", image: UIImage(named: "in_progress")),
+			SegmentioItem(title: "Recieved", image: UIImage(named: "recieved")),
+			SegmentioItem(title: "Deliveried", image: UIImage(named: "deliveried"))
 		]
 	}
 
@@ -39,18 +41,20 @@ class TodayViewController: UIViewController,ItemProtocol {
 		rightButtonView.addGestureRecognizer(tapGesture)
 		self.tabBarController?.navigationItem.rightBarButtonItem =  UIBarButtonItem(customView: rightButtonView)
 
-	}
-	override func viewDidAppear(_ animated: Bool) {
-		super .viewDidAppear(animated)
+
+		view.backgroundColor = UIColor.white
 		setupSegmentsViewConstraints()
+
 		setupScrollView()
 		segmentioView.setup(
 			content: self.segmentioContent(),
 			style: SegmentioStyle.onlyLabel,
 			options: SegmentioOptions(
-				backgroundColor: UIColor.white,
-				segmentPosition: .fixed(maxVisibleItems: 2),
-				scrollEnabled: true
+				backgroundColor: ColorPalette.white,
+				segmentPosition: .fixed(maxVisibleItems: 4),
+				scrollEnabled: true,
+				horizontalSeparatorOptions: TodayViewController.segmentioHorizontalSeparatorOptions(),
+				segmentStates: TodayViewController.segmentioStates()
 			)
 		)
 		segmentioView.valueDidChange = { [weak self] _, segmentIndex in
@@ -62,9 +66,23 @@ class TodayViewController: UIViewController,ItemProtocol {
 				)
 			}
 		}
+		segmentioView.selectedSegmentioIndex = selectedSegmentioIndex()
+
+
+	}
+	override func viewDidAppear(_ animated: Bool) {
+		super .viewDidAppear(animated)
+
 
 	}
 
+	private func goToControllerAtIndex(_ index: Int) {
+		segmentioView.selectedSegmentioIndex = index
+	}
+
+	private func selectedSegmentioIndex() -> Int {
+		return 0
+	}
 	@objc func handleNewItem(){
 		createNewItem(user: nil)
 	}
@@ -73,25 +91,6 @@ class TodayViewController: UIViewController,ItemProtocol {
 		let chatLogController = ChatLogController(collectionViewLayout: UICollectionViewFlowLayout())
 		chatLogController.user = user
 		self.tabBarController?.navigationController?.pushViewController(chatLogController, animated: true)
-	}
-
-	private func setupScrollView() {
-		scrollView.contentSize = CGSize(
-			width: UIScreen.main.bounds.width * CGFloat(viewControllers.count),
-			height: containerView.frame.height
-		)
-
-		for (index, viewController) in viewControllers.enumerated() {
-			viewController.view.frame = CGRect(
-				x: UIScreen.main.bounds.width * CGFloat(index),
-				y: 0,
-				width: view.frame.width,
-				height: view.frame.height
-			)
-			addChild(viewController)
-			scrollView.addSubview(viewController.view, options: .useAutoresize) // module's extension
-			viewController.didMove(toParent: self)
-		}
 	}
 
 	func setupSegmentsViewConstraints(){
@@ -118,6 +117,96 @@ class TodayViewController: UIViewController,ItemProtocol {
 		scrollView.rightAnchor.constraint(equalTo: containerView.rightAnchor).isActive = true
 		scrollView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor).isActive = true
 	}
+
+	private func setupScrollView() {
+		scrollView.contentSize = CGSize(
+			width: UIScreen.main.bounds.width * CGFloat(viewControllers.count),
+			height: containerView.frame.height
+		)
+
+		for (index, viewController) in viewControllers.enumerated() {
+			viewController.view.translatesAutoresizingMaskIntoConstraints = false
+			viewController.view.frame = CGRect(
+				x: UIScreen.main.bounds.width * CGFloat(index),
+				y: 0,
+				width: view.frame.width,
+				height: self.containerView.frame.height
+			)
+			viewController.positionView = index
+
+			addChild(viewController)
+			scrollView.addSubview(viewController.view, options: .useAutoresize) // module's extension
+						viewController.didMove(toParent: self)
+		}
+		scrollView.delegate = self
+		scrollView.isPagingEnabled = true
+		scrollView.showsHorizontalScrollIndicator = false
+		scrollView.isMultipleTouchEnabled = true
+
+	}
+
+	private static func segmentioStates() -> SegmentioStates {
+		let font = UIFont.systemFont(ofSize: 13)
+		return SegmentioStates(
+			defaultState: segmentioState(
+				backgroundColor: .clear,
+				titleFont: font,
+				titleTextColor: ColorPalette.grayChateau
+			),
+			selectedState: segmentioState(
+				backgroundColor: .cyan,
+				titleFont: font,
+				titleTextColor: ColorPalette.black
+			),
+			highlightedState: segmentioState(
+				backgroundColor: ColorPalette.whiteSmoke,
+				titleFont: font,
+				titleTextColor: ColorPalette.grayChateau
+			)
+		)
+	}
+
+	struct ColorPalette {
+
+		static let white = UIColor(r: 255, g: 255, b: 255)
+		static let black = UIColor(r: 3, g: 3, b: 3)
+		static let coral = UIColor(r: 244, g: 111, b: 96)
+		static let whiteSmoke = UIColor(r: 245, g: 245, b: 245)
+		static let grayChateau = UIColor(r: 163, g: 164, b: 168)
+
+	}
+	private static func segmentioState(backgroundColor: UIColor, titleFont: UIFont, titleTextColor: UIColor) -> SegmentioState {
+		return SegmentioState(
+			backgroundColor: backgroundColor,
+			titleFont: titleFont,
+			titleTextColor: titleTextColor
+		)
+	}
+
+	private static func segmentioIndicatorOptions() -> SegmentioIndicatorOptions {
+		return SegmentioIndicatorOptions(
+			type: .bottom,
+			ratio: 1,
+			height: 5,
+			color: ColorPalette.coral
+		)
+	}
+
+	private static func segmentioHorizontalSeparatorOptions() -> SegmentioHorizontalSeparatorOptions {
+		return SegmentioHorizontalSeparatorOptions(
+			type: .topAndBottom,
+			height: 1,
+			color: ColorPalette.whiteSmoke
+		)
+	}
+
+	private static func segmentioVerticalSeparatorOptions() -> SegmentioVerticalSeparatorOptions {
+		return SegmentioVerticalSeparatorOptions(
+			ratio: 1,
+			color: ColorPalette.whiteSmoke
+		)
+	}
+
 }
 extension TodayViewController: UIScrollViewDelegate {
 

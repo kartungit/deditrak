@@ -121,17 +121,6 @@ class HistoryDaysController: UIViewController, UITableViewDataSource, UITableVie
 		return nil
 	}
 
-	func bindingUserFrom(snapshot: DataSnapshot) -> User? {
-		let user = User()
-		if let dictionary = snapshot.value as? [String: Any] {
-			user.office = dictionary["office"] as? String
-			user.id = dictionary["id"] as? String
-			user.email = dictionary["email"] as? String
-			user.name = dictionary["name"] as? String
-		}
-		return user
-	}
-
 	func observerUserMessages(){
 		if let uOffice = self.userInfo.office {
 			let ref = Database.database().reference().child("user-messages").child(uOffice)
@@ -197,8 +186,11 @@ class HistoryDaysController: UIViewController, UITableViewDataSource, UITableVie
 	fileprivate func fetchUserAndSetupNavbarTitle() {
 		let uid = Auth.auth().currentUser?.uid
 		Database.database().reference().child("users").child(uid!).observeSingleEvent(of: .value) { (snapshot) in
-			if let user = self.bindingUserFrom(snapshot: snapshot){
+			if let user = User.bindingUserFrom(snapshot: snapshot){
 				self.userInfo = user
+				let appDelegate = UIApplication.shared.delegate as! AppDelegate
+				appDelegate.userInfo = user
+				
 				// self.navigationItem.title = user.name
 				self.setupNavigationTitleView()
 			}

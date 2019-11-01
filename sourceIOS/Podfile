@@ -14,7 +14,8 @@ target 'gameofChat' do
 	pod 'DropDown'
 	pod 'FontAwesome.swift'
 	pod 'Segmentio'
-	pod '"'SearchTextField'
+	pod 'SearchTextField'
+	pod 'Alamofire', '~> 5.0.0-rc.3'
 
 
   target 'gameofChatTests' do

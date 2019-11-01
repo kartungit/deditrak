@@ -218,7 +218,10 @@ class MessageController: UITableViewController {
 	fileprivate func fetchUserAndSetupNavbarTitle() {
 		let uid = Auth.auth().currentUser?.uid
 		Database.database().reference().child("users").child(uid!).observeSingleEvent(of: .value) { (snapshot) in
-			if let user = self.bindingUserFrom(snapshot: snapshot){
+			if let user = User.bindingUserFrom(snapshot: snapshot){
+				let appDelegate = UIApplication.shared.delegate as! AppDelegate
+				appDelegate.userInfo = user
+				
 				self.setupNavigationTitleView(user: user)
 			}
 		}

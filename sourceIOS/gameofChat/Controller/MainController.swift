@@ -32,7 +32,7 @@ class MainController: UITabBarController {
 		let itemSearch = UITabBarItem()
 		itemSearch.title = "Search"
 		itemSearch.image = UIImage(named: "home_icon")
-		let searchVC = SearchController()
+		let searchVC:UIViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier:"SearchViewController") as UIViewController
 		searchVC.tabBarItem = itemSearch
 
 		let itemHistory = UITabBarItem()

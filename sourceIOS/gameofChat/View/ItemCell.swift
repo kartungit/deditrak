@@ -37,7 +37,9 @@ class ItemCell: UITableViewCell {
 			guard let itemData = item, let userData = user else {
 				return
 			}
-			hideNext = (userData.office == itemData.fromOffice && (itemData.status == "In Progress" || itemData.status == "Recieved")) || itemData.status == "Deliveried" || (userData.office != itemData.fromOffice && itemData.status == "New")
+			hideNext = (userData.office == itemData.fromOffice &&
+				(itemData.status == Common.STATUS_INPROGRESS || itemData.status == Common.STATUS_RECEIVED)) ||
+				itemData.status == Common.STATUS_DELIVERIED || (userData.office != itemData.fromOffice && itemData.status == Common.STATUS_NEW)
 		}
 	}
 	var hideNext = false
@@ -223,13 +225,13 @@ class ItemCell: UITableViewCell {
 				return UIImage(named: "new")
 			}
 			switch currentStatus {
-			case "New":
+			case Common.STATUS_NEW:
 				return UIImage(named: "in_progress")
-			case "In Progress":
+			case Common.STATUS_INPROGRESS:
 				return UIImage(named: "recieved")
-			case "Recieved":
+			case Common.STATUS_RECEIVED:
 				return UIImage(named: "delivered")
-			case "Deliveried":
+			case Common.STATUS_DELIVERIED:
 				return UIImage(named: "delivered")
 			default:
 				return UIImage(named: "new")

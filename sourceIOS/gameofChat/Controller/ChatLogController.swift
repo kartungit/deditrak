@@ -376,19 +376,9 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 					 "toOffice": toOffice,
 					 "quantity": quantityTextField.text!,
 					 "sender" : senderTextField.text!,
-					 "reciever": recieverTextField.text!,
-					 "status" : "New",
+					 "receiver": recieverTextField.text!,
+					 "status" : Common.STATUS_NEW,
 					 "userId" : appDelegate.userInfo.id ?? ""] as [String : Any]
-
-		let valueString = ["title": inputTextField.text!,
-					 "time": String(timestamp),
-					 "category": category,
-					 "fromOffice" : fromOffice,
-					 "toOffice": toOffice,
-					 "quantity": quantityTextField.text!,
-					 "sender" : senderTextField.text!,
-					 "reciever": recieverTextField.text!,
-					 "status" : "New"] as [String : Any]
 
 		let ref = Database.database().reference().child("messages")
 		let childRef = (self.viewDetailMode) ? ref.child(item.itemId!) : ref.childByAutoId()
@@ -414,13 +404,13 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 				recipientUserMessage.updateChildValues([messageId: "TODO"])
 
 				// call api create new ITEM
-				self!.newItem(parameters: valueString)
+				self!.newItem(parameters: value)
 			}
 			else{
 				// update
 				// self!.navigationController?.popViewController(animated: true)
 				// call api create Update ITEM
-				self?.updateItem(parameters: valueString)
+				self?.updateItem(parameters: value)
 			}
 		}
 	}

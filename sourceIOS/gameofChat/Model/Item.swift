@@ -57,7 +57,7 @@ class Item: NSObject {
 			item.fromOffice = dictionary["fromOffice"] as? String
 			item.toOffice = dictionary["toOffice"] as? String
 			item.quantity = dictionary["quantity"] as? String
-			item.reciever = dictionary["reciever"] as? String
+			item.reciever = dictionary["receiver"] as? String
 			item.sender = dictionary["sender"] as? String
 			item.status = dictionary["status"] as? String
 			item.timestamp = dictionary["timestamp"] as? NSNumber

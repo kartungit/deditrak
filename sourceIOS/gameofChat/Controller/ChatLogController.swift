@@ -130,10 +130,16 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 		super .viewDidLoad()
 		collectionView?.backgroundColor = .white
 
+		let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
+		view.addGestureRecognizer(tap)
 	}
 
+	@objc func dismissKeyboard() {
+		//Causes the view (or one of its embedded text fields) to resign the first responder status.
+		view.endEditing(true)
+	}
 	func bindingUserFrom(snapshot: DataSnapshot) -> User? {
-		let user = User()
+		let user = User(id: "")
 		if let dictionary = snapshot.value as? [String: Any] {
 			user.office = dictionary["office"] as? String
 			user.id = dictionary["id"] as? String

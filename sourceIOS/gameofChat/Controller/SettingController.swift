@@ -61,6 +61,22 @@ class SettingController: UIViewController, UITableViewDelegate, UITableViewDataS
 		logoutButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16).isActive = true
 		logoutButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
 		logoutButton.widthAnchor.constraint(equalToConstant: 120).isActive = true
+
+		let versionLabel = UILabel()
+		versionLabel.font = UIFont.systemFont(ofSize: 12)
+		versionLabel.textColor = UIColor(r: 26, g: 86, b: 131)
+		versionLabel.textAlignment = .right
+		versionLabel.numberOfLines = 1
+		versionLabel.translatesAutoresizingMaskIntoConstraints = false
+
+		view.addSubview(versionLabel)
+		let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+		versionLabel.text = "Ver: \(String(describing: appVersion!))"
+
+		versionLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -4).isActive = true
+		versionLabel.heightAnchor.constraint(equalToConstant: 30).isActive = true
+		versionLabel.widthAnchor.constraint(equalToConstant: 100).isActive = true
+		versionLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 4).isActive = true
 	}
 
 	func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

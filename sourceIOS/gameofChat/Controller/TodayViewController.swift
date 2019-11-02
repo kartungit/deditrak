@@ -8,6 +8,7 @@
 
 import UIKit
 import Segmentio
+import Firebase
 
 class TodayViewController: UIViewController,ItemProtocol,BadgeDelegate {
 
@@ -19,9 +20,13 @@ class TodayViewController: UIViewController,ItemProtocol,BadgeDelegate {
 			removeBadgeAt(index: currentTab)
 		}
 	}
+	var newBadgeNumber = 0
+	var inprogressBadgeNumber = 0
+	var receiBadgeNumber = 0
+	var deliBadgeNumber = 0
 
 	private lazy var viewControllers: [MessageController] = {
-		return [MessageController(with: "New", delegate: self),MessageController(with: "In Progress", delegate: self),MessageController(with: "Recieved", delegate: self),MessageController(with: "Deliveried", delegate: self)]
+		return [MessageController(with: "New", delegate: self, badge: self.newBadgeNumber),MessageController(with: "In Progress", delegate: self, badge: self.inprogressBadgeNumber),MessageController(with: "Recieved", delegate: self, badge: self.receiBadgeNumber),MessageController(with: "Deliveried", delegate: self, badge: self.deliBadgeNumber)]
 	}()
 
 	private func segmentioContent() -> [SegmentioItem] {
@@ -45,6 +50,7 @@ class TodayViewController: UIViewController,ItemProtocol,BadgeDelegate {
 		self.tabBarController?.navigationItem.rightBarButtonItem =  UIBarButtonItem(customView: rightButtonView)
 
 		view.backgroundColor = UIColor.white
+		
 		setupSegmentsViewConstraints()
 
 		setupScrollView()
@@ -59,6 +65,8 @@ class TodayViewController: UIViewController,ItemProtocol,BadgeDelegate {
 				segmentStates: TodayViewController.segmentioStates()
 			)
 		)
+		reanderBadgeNumber()
+
 		segmentioView.valueDidChange = { [weak self] _, segmentIndex in
 			if let scrollViewWidth = self?.scrollView.frame.width {
 				let contentOffsetX = scrollViewWidth * CGFloat(segmentIndex)
@@ -70,7 +78,6 @@ class TodayViewController: UIViewController,ItemProtocol,BadgeDelegate {
 			}
 		}
 		segmentioView.selectedSegmentioIndex = self.selectedSegmentioIndex()
-
 
 	}
 	override func viewDidAppear(_ animated: Bool) {
@@ -100,29 +107,80 @@ class TodayViewController: UIViewController,ItemProtocol,BadgeDelegate {
 	}
 
 	func updateBadgeValue(segIndex: Int, value: Int){
-		
-		segmentioView.addBadge(
-			at: segIndex,
-			count: value,
-			color: ColorPalette.coral
-		)
+		addBadgeNumber(segIndex: segIndex, value: value)
 		updateUnSeenNumber(segIndex: segIndex, value: value)
 	}
+
+	func addBadgeNumber(segIndex: Int, value: Int){
+		if value == 0 {
+			segmentioView.removeBadge(at: segIndex)
+		} else {
+			segmentioView.addBadge(
+				at: segIndex,
+				count: value,
+				color: ColorPalette.coral
+			)
+		}
+	}
+
+	func reanderBadgeNumber(){
+		let decoded  = UserDefaults.standard.data(forKey: "userData")
+		let userData = NSKeyedUnarchiver.unarchiveObject(with: decoded!) as! User
+		newBadgeNumber = Int(userData.unseenNew!) ?? 0
+		addBadgeNumber(segIndex: 0, value: newBadgeNumber)
+		inprogressBadgeNumber = Int(userData.unseenInProgress!) ?? 0
+		addBadgeNumber(segIndex: 1, value: inprogressBadgeNumber)
+		receiBadgeNumber = Int(userData.unseenRecieved!) ?? 0
+		addBadgeNumber(segIndex: 2, value: receiBadgeNumber)
+		deliBadgeNumber = Int(userData.unseenDeliveried!) ?? 0
+		addBadgeNumber(segIndex: 3, value: deliBadgeNumber)
+	}
+
 	func updateUnSeenNumber(segIndex: Int, value: Int){
 		let decoded  = UserDefaults.standard.data(forKey: "userData")
 		let userData = NSKeyedUnarchiver.unarchiveObject(with: decoded!) as! User
+		let ref = Database.database().reference().child("users").child(userData.id!)
+
 		switch segIndex {
 		case 0:
 			userData.unseenNew = String(value)
+			ref.updateChildValues(["unseenNew": String(value)]) {
+				(error, ref) in
+				if error != nil {
+					print(error!)
+					return
+				}
+			}
 			break
 		case 1:
 			userData.unseenInProgress = String(value)
+			ref.updateChildValues(["unseenInProgress": String(value)]) {
+				(error, ref) in
+				if error != nil {
+					print(error!)
+					return
+				}
+			}
 			break
 		case 2:
 			userData.unseenRecieved = String(value)
+			ref.updateChildValues(["unseenRecieved": String(value)]) {
+				(error, ref) in
+				if error != nil {
+					print(error!)
+					return
+				}
+			}
 			break
 		case 3:
 			userData.unseenDeliveried = String(value)
+			ref.updateChildValues(["unseenDeliveried": String(value)]) {
+				(error, ref) in
+				if error != nil {
+					print(error!)
+					return
+				}
+			}
 			break
 		default:
 			break
@@ -130,6 +188,9 @@ class TodayViewController: UIViewController,ItemProtocol,BadgeDelegate {
 		let encodedData: Data = NSKeyedArchiver.archivedData(withRootObject: userData)
 		UserDefaults.standard.set(encodedData, forKey: "userData")
 		UserDefaults.standard.synchronize()
+	}
+	func updateUserDataToFirebase(userData: User){
+
 	}
 	func setupSegmentsViewConstraints(){
 

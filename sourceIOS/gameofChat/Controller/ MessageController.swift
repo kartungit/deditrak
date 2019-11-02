@@ -29,9 +29,10 @@ class MessageController: UITableViewController {
 	var delegate : BadgeDelegate?
 	var currentBadge = 0
 
-	init(with status: String,delegate: BadgeDelegate) {
+	init(with status: String,delegate: BadgeDelegate, badge: Int) {
 		self.baseStatus = status
 		self.delegate = delegate
+		self.currentBadge = badge
 		super.init(nibName: nil, bundle: nil)
 	}
 
@@ -44,7 +45,7 @@ class MessageController: UITableViewController {
 
 		tableView.register(ItemCell.self, forCellReuseIdentifier: cellId)
 		observeMessages()
-		getCurrentBadgeNumber()
+//		getCurrentBadgeNumber()
 	}
 
 	override func viewDidAppear(_ animated: Bool) {
@@ -97,26 +98,6 @@ class MessageController: UITableViewController {
 		}
 	}
 
-	func getCurrentBadgeNumber() {
-		let decoded  = UserDefaults.standard.data(forKey: "userData")
-		let userData = NSKeyedUnarchiver.unarchiveObject(with: decoded!) as! User
-		switch positionView {
-		case 0:
-			currentBadge = Int(userData.unseenNew!) ?? 0
-			return
-		case 1:
-			currentBadge = Int(userData.unseenInProgress!) ?? 0
-			return
-		case 2:
-			currentBadge = Int(userData.unseenRecieved!) ?? 0
-			return
-		case 3:
-			currentBadge = Int(userData.unseenDeliveried!) ?? 0
-			return
-		default:
-			return
-		}
-	}
 	func bindingItemFrom(snapshot : DataSnapshot) -> Item? {
 		if let dictionary = snapshot.value as? [String: Any] {
 			let item = Item()

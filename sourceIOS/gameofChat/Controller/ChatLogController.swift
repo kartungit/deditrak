@@ -27,12 +27,14 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 	var viewDetailMode = false
 	var isEditable = true
 	var item: Item!
+	var updating = false
+	var deleting = false
+
 	lazy var containerView : UIView = {
 		let view = UIView()
 		view.translatesAutoresizingMaskIntoConstraints = false
 		return view
 	}()
-
 
 	lazy var inputTextField: UITextField = {
 		let textField = UITextField()
@@ -139,6 +141,8 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 		view.addGestureRecognizer(tap)
 
 		self.navigationItem.title = "New Item"
+		self.updating = false
+		self.deleting = false
 	}
 
 	@objc func dismissKeyboard() {
@@ -350,25 +354,33 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 	}
 
 	@objc func handleSend() {
-//		let toId = user!.id!
+		if (updating){
+			print("is updating ...")
+			return
+		}
+		updating = true
+
 		let fromId = Auth.auth().currentUser!.uid
 		let timestamp: Int = Int(NSDate().timeIntervalSince1970)
 		guard let category = categoryButton.titleLabel?.text, category != "Category" else {
 			alertWith(message: "Category is required")
+			updating = false
 			return
 		}
 		guard let fromOffice = fromOfficeButton.titleLabel?.text, fromOffice != "From office" else {
 			alertWith(message: "from Office is required")
+			updating = false
 			return
 		}
 		guard let toOffice = toOfficeButton.titleLabel?.text, toOffice != "To office" else {
 			alertWith(message: "to Office is required")
+			updating = false
 			return
 		}
 
 		let appDelegate = UIApplication.shared.delegate as! AppDelegate
 
-		let value = ["title": inputTextField.text!,
+		var value = ["title": inputTextField.text!,
 					 "fromId": fromId,
 					 "timestamp": timestamp,
 					 "category": category,
@@ -385,8 +397,12 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 		childRef.updateChildValues(value) {[weak self] (error, ref) in
 			if error != nil {
 				print(error!)
+				self!.updating = false
 				return;
 			}
+
+			// send UDID to server to same with Firebase
+			value["uid"] = childRef.key
 
 			if self!.viewDetailMode == false {
 				let userMessagesRef = Database.database().reference().child("user-messages").child(fromOffice)
@@ -395,6 +411,7 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 					(error, ref) in
 					if error != nil {
 						print(error!)
+						self!.updating = false
 						return
 					}
 				}
@@ -416,18 +433,28 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 	}
 
 	@objc func handleDeleteItem(){
+
+		if (self.deleting){
+			print("is deleting ...")
+			return
+		}
+
+		self.deleting = true
+
 		let alert = UIAlertController(title: "Alert", message: "Are you sure to remove this item?", preferredStyle: .alert)
 		alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: { (action) in
-
 			let ref = Database.database().reference().child("messages").child(self.item.itemId!)
 			let fromOfficeRef = Database.database().reference().child("user-messages").child(self.item.fromOffice!).child(self.item.itemId!)
 			let toOfficeRef = Database.database().reference().child("user-messages").child(self.item.toOffice!).child(self.item.itemId!)
 			ref.removeValue()
 			fromOfficeRef.removeValue()
 			toOfficeRef.removeValue()
-			self.navigationController?.popViewController(animated: true)
+
+			self.deleteItem(uid: self.item.itemId!)
 		}))
-		alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: nil))
+		alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { (action) in
+			self.deleting = false
+		}))
 		self.present(alert, animated: true, completion: nil)
 	}
 
@@ -445,6 +472,7 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 	func newItem(parameters: [String: Any]){
 		guard let url = URL(string: Common.API_NEW_ITEM) else {
 			showAlert(message: "Can't connect to api, please check your server again.")
+			self.updating = false
 			return
 		}
 
@@ -459,6 +487,8 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 
 		urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
+		print(parameters)
+
 		AF.request(urlRequest)
 		.responseJSON { (response: DataResponse) in
 			switch response.result {
@@ -469,13 +499,13 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 				}
 
 				DispatchQueue.main.async {
-					//
+					self.updating = false
 					self.navigationController?.popViewController(animated: true)
 				}
-
 				break
 			case .failure(let error):
 				print(error.localizedDescription)
+				self.updating = false
 				DispatchQueue.main.async {
 					self.showAlert(message: "Search failed with error: \(error.localizedDescription)")
 				}
@@ -487,6 +517,7 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 	func updateItem(parameters: [String: Any]){
 		guard let url = URL(string: Common.API_UPDATE_ITEM) else {
 			showAlert(message: "Can't connect to api, please check your server again.")
+			self.updating = false
 			return
 		}
 
@@ -501,6 +532,8 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 
 		urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
+		print(parameters)
+
 		AF.request(urlRequest)
 			.responseJSON { (response: DataResponse) in
 				switch response.result {
@@ -509,7 +542,7 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 					if let jsonArray = json as? [[String: Any]] {
 						print(jsonArray)
 					}
-
+					self.updating = false
 					DispatchQueue.main.async {
 						//
 						self.navigationController?.popViewController(animated: true)
@@ -518,6 +551,41 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 					break
 				case .failure(let error):
 					print(error.localizedDescription)
+					self.updating = false
+					DispatchQueue.main.async {
+						self.showAlert(message: "Search failed with error: \(error.localizedDescription)")
+					}
+					break
+				}
+		}
+	}
+
+	func deleteItem(uid: String){
+		guard let url = URL(string: Common.API_DELETE_ITEM) else {
+			showAlert(message: "Can't connect to api, please check your server again.")
+			self.deleting = false
+			return
+		}
+
+		print("delete \(uid)")
+
+		AF.request(url, method: .delete, parameters: ["uid": uid])
+			.validate()
+			.responseJSON { (response: DataResponse) in
+				switch response.result {
+				case .success(let json):
+					print(json)
+					if let jsonArray = json as? [[String: Any]] {
+						print(jsonArray)
+					}
+					self.deleting = false
+					DispatchQueue.main.async {
+						self.navigationController?.popViewController(animated: true)
+					}
+					break
+				case .failure(let error):
+					print(error.localizedDescription)
+					self.deleting = false
 					DispatchQueue.main.async {
 						self.showAlert(message: "Search failed with error: \(error.localizedDescription)")
 					}

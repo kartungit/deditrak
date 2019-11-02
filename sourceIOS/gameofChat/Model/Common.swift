@@ -12,6 +12,7 @@ class Common{
 
 	static let API_NEW_ITEM = "http://192.168.100.130:8080/items/create"
 	static let API_UPDATE_ITEM = "http://192.168.100.130:8080/items/update"
+	static let API_DELETE_ITEM = "http://192.168.100.130:8080/items/delete"
 	static let API_SEARCH = "http://192.168.100.130:8080/items/search"
 
 	static let emptyText : String = "---"

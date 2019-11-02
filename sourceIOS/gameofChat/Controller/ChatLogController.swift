@@ -60,6 +60,7 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 		textField.addTarget(self, action: #selector(validationInput), for: UIControl.Event.editingChanged)
 		textField.translatesAutoresizingMaskIntoConstraints = false
 		textField.delegate = self
+		textField.keyboardType = .numberPad
 		textField.isEnabled = self.isEditable
 		return textField
 	}()
@@ -409,5 +410,8 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 		alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
 		self.present(alert, animated: true, completion: nil)
 	}
-
+	func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+		textField.resignFirstResponder()
+		return true
+	}
 }

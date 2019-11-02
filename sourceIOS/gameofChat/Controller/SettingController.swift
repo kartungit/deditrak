@@ -121,8 +121,10 @@ class SettingController: UIViewController, UITableViewDelegate, UITableViewDataS
 			print("LOGOUT ERROR :: \(logoutError)")
 		}
 		self.tabBarController?.selectedIndex = 0
-
+		UserDefaults.standard.removeObject(forKey: "userData")
 		let loginController = LoginController()
+
+		loginController.delegate = self.tabBarController as! MainController
 		present(loginController, animated: true, completion: nil)
 	}
 

@@ -132,12 +132,14 @@ class ItemCell: UITableViewCell {
 	}
 
 	func renderOfficeLable(label: UILabel,text: String){
-		if text == user?.office {
-			label.font = UIFont.fontAwesome(ofSize: 24, style: .solid)
-			label.text = String.fontAwesomeIcon(name: .home)
-		} else {
-			label.text = text
-		}
+//		if text == user?.office {
+//			label.font = UIFont.fontAwesome(ofSize: 24, style: .solid)
+//			label.text = String.fontAwesomeIcon(name: .home)
+//		} else {
+//			label.text = text
+//		}
+		label.text = text
+
 	}
 
 	func setupOfficesView(){

@@ -287,6 +287,11 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
 		self.present(alert, animated: true)
 	}
 
+
+	@objc func dismissKeyboard() {
+		//Causes the view (or one of its embedded text fields) to resign the first responder status.
+		view.endEditing(true)
+	}
 	func editItem(item: Item?, userInfo: User?){
 		let chatLogController = ChatLogController(collectionViewLayout: UICollectionViewFlowLayout())
 		chatLogController.item = item

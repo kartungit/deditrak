@@ -9,9 +9,11 @@
 import UIKit
 import Firebase
 import FirebaseDatabase
+protocol loginDelegate {
+	func reloadMainController()
+}
 
-
-class MainController: UITabBarController {
+class MainController: UITabBarController,loginDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -94,6 +96,9 @@ class MainController: UITabBarController {
 		fetchUserAndSetupNavbarTitle(uid : uid)
 
 	}
+	func reloadMainController(){
+		checkIfUserLoggedIn()
+	}
 	@objc func handleLogout(){
 
 		do {
@@ -103,6 +108,7 @@ class MainController: UITabBarController {
 		}
 
 		let loginController = LoginController()
+		loginController.delegate = self
 		present(loginController, animated: true, completion: nil)
 	}
 }

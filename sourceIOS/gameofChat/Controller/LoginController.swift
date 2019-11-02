@@ -12,6 +12,7 @@ import FirebaseDatabase
 
 class LoginController: UIViewController {
 
+	var delegate : loginDelegate?
 	let inputContainerView: UIView = {
 		let view = UIView()
 		return view
@@ -53,6 +54,19 @@ class LoginController: UIViewController {
 
 				return
 			}
+			if let uid = Auth.auth().currentUser?.uid {
+				let ref = Database.database().reference().child("users").child(uid).observeSingleEvent(of: .value) { (snapshot) in
+					if let dictionary = snapshot.value as? [String : Any] {
+						if let bindingUser = User.bindingUserFrom(snapshot: snapshot) {
+							let encodedData: Data = NSKeyedArchiver.archivedData(withRootObject: bindingUser)
+							UserDefaults.standard.set(encodedData, forKey: "userData")
+							UserDefaults.standard.synchronize()
+							self.delegate?.reloadMainController()
+						}
+					}
+				}
+			}
+
 			self.dismiss(animated: true, completion: nil)
 		}
 	}
@@ -104,11 +118,13 @@ class LoginController: UIViewController {
 
 	lazy var profileImageView: UIImageView = {
 		let imageView = UIImageView()
-		imageView.image = #imageLiteral(resourceName: "user")
+		imageView.image = UIImage(named: "dide_appicon")
 		imageView.translatesAutoresizingMaskIntoConstraints = false
 		imageView.contentMode = .scaleAspectFill
+		imageView.layer.cornerRadius = 30
+		imageView.layer.masksToBounds = true
 
-		imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleSelectProfileImageView)))
+		// imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleSelectProfileImageView)))
 		imageView.isUserInteractionEnabled = true
 		return imageView
 	}()

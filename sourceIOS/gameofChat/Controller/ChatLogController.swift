@@ -9,6 +9,8 @@
 import UIKit
 import Firebase
 import DropDown
+import SearchTextField
+import Alamofire
 
 class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 
@@ -84,25 +86,27 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 		return button
 	}()
 
-	lazy var senderTextField: UITextField = {
-		let textField = UITextField()
+	lazy var senderTextField: SearchTextField = {
+		let textField = SearchTextField()
 		textField.placeholder = "Sender"
 		textField.borderStyle = UITextField.BorderStyle.bezel
 		textField.addTarget(self, action: #selector(validationInput), for: UIControl.Event.editingChanged)
 		textField.translatesAutoresizingMaskIntoConstraints = false
 		textField.delegate = self
 		textField.isEnabled = self.isEditable
+		textField.filterStrings(Common.username)
 		return textField
 	}()
 
-	lazy var recieverTextField: UITextField = {
-		let textField = UITextField()
+	lazy var recieverTextField: SearchTextField = {
+		let textField = SearchTextField()
 		textField.placeholder = "Reciever"
 		textField.borderStyle = UITextField.BorderStyle.bezel
 		textField.addTarget(self, action: #selector(validationInput), for: UIControl.Event.editingChanged)
 		textField.translatesAutoresizingMaskIntoConstraints = false
 		textField.delegate = self
 		textField.isEnabled = self.isEditable
+		textField.filterStrings(Common.username)
 		return textField
 	}()
 
@@ -133,6 +137,8 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 
 		let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
 		view.addGestureRecognizer(tap)
+
+		self.navigationItem.title = "New Item"
 	}
 
 	@objc func dismissKeyboard() {
@@ -359,9 +365,29 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 			alertWith(message: "to Office is required")
 			return
 		}
-		let value = ["title": inputTextField.text!, "fromId": fromId, "timestamp": timestamp,
-					 "category": category, "fromOffice" : fromOffice, "toOffice": toOffice,
-					 "quantity": quantityTextField.text!, "sender" : senderTextField.text!, "reciever": recieverTextField.text!,
+
+		let appDelegate = UIApplication.shared.delegate as! AppDelegate
+
+		let value = ["title": inputTextField.text!,
+					 "fromId": fromId,
+					 "timestamp": timestamp,
+					 "category": category,
+					 "fromOffice" : fromOffice,
+					 "toOffice": toOffice,
+					 "quantity": quantityTextField.text!,
+					 "sender" : senderTextField.text!,
+					 "reciever": recieverTextField.text!,
+					 "status" : "New",
+					 "userId" : appDelegate.userInfo.id ?? ""] as [String : Any]
+
+		let valueString = ["title": inputTextField.text!,
+					 "time": String(timestamp),
+					 "category": category,
+					 "fromOffice" : fromOffice,
+					 "toOffice": toOffice,
+					 "quantity": quantityTextField.text!,
+					 "sender" : senderTextField.text!,
+					 "reciever": recieverTextField.text!,
 					 "status" : "New"] as [String : Any]
 
 		let ref = Database.database().reference().child("messages")
@@ -371,7 +397,8 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 				print(error!)
 				return;
 			}
-			if self!.viewDetailMode != true {
+
+			if self!.viewDetailMode == false {
 				let userMessagesRef = Database.database().reference().child("user-messages").child(fromOffice)
 				let messageId = childRef.key as! String
 				userMessagesRef.updateChildValues([messageId: "TODO"]) {
@@ -385,8 +412,16 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 				childRef.updateChildValues(["itemId": messageId])
 				let recipientUserMessage = Database.database().reference().child("user-messages").child(toOffice)
 				recipientUserMessage.updateChildValues([messageId: "TODO"])
+
+				// call api create new ITEM
+				self!.newItem(parameters: valueString)
 			}
-			self!.navigationController?.popViewController(animated: true)
+			else{
+				// update
+				// self!.navigationController?.popViewController(animated: true)
+				// call api create Update ITEM
+				self?.updateItem(parameters: valueString)
+			}
 		}
 	}
 
@@ -405,13 +440,108 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 		alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: nil))
 		self.present(alert, animated: true, completion: nil)
 	}
+
 	func alertWith(message: String){
 		let alert = UIAlertController(title: "Alert", message: message, preferredStyle: .alert)
 		alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
 		self.present(alert, animated: true, completion: nil)
 	}
+
 	func textFieldShouldReturn(_ textField: UITextField) -> Bool {
 		textField.resignFirstResponder()
 		return true
 	}
+
+	func newItem(parameters: [String: Any]){
+		guard let url = URL(string: Common.API_NEW_ITEM) else {
+			showAlert(message: "Can't connect to api, please check your server again.")
+			return
+		}
+
+		var urlRequest = URLRequest(url: url)
+		urlRequest.httpMethod = "POST"
+
+		do {
+			urlRequest.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
+		} catch {
+			// No-op
+		}
+
+		urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+		AF.request(urlRequest)
+		.responseJSON { (response: DataResponse) in
+			switch response.result {
+			case .success(let json):
+				print(json)
+				if let jsonArray = json as? [[String: Any]] {
+					print(jsonArray)
+				}
+
+				DispatchQueue.main.async {
+					//
+					self.navigationController?.popViewController(animated: true)
+				}
+
+				break
+			case .failure(let error):
+				print(error.localizedDescription)
+				DispatchQueue.main.async {
+					self.showAlert(message: "Search failed with error: \(error.localizedDescription)")
+				}
+				break
+			}
+		}
+	}
+
+	func updateItem(parameters: [String: Any]){
+		guard let url = URL(string: Common.API_UPDATE_ITEM) else {
+			showAlert(message: "Can't connect to api, please check your server again.")
+			return
+		}
+
+		var urlRequest = URLRequest(url: url)
+		urlRequest.httpMethod = "PUT"
+
+		do {
+			urlRequest.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: [])
+		} catch {
+			// No-op
+		}
+
+		urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+		AF.request(urlRequest)
+			.responseJSON { (response: DataResponse) in
+				switch response.result {
+				case .success(let json):
+					print(json)
+					if let jsonArray = json as? [[String: Any]] {
+						print(jsonArray)
+					}
+
+					DispatchQueue.main.async {
+						//
+						self.navigationController?.popViewController(animated: true)
+					}
+
+					break
+				case .failure(let error):
+					print(error.localizedDescription)
+					DispatchQueue.main.async {
+						self.showAlert(message: "Search failed with error: \(error.localizedDescription)")
+					}
+					break
+				}
+		}
+	}
+
+	func showAlert(message:String){
+		let alert = UIAlertController(title: "", message: message, preferredStyle: .alert)
+
+		alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: nil))
+
+		self.present(alert, animated: true)
+	}
+
 }

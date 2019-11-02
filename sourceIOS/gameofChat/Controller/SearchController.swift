@@ -51,7 +51,9 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
 		tableResult.register(ItemCell.self, forCellReuseIdentifier: cellId)
 
 		let appDelegate = UIApplication.shared.delegate as! AppDelegate
-		self.userInfo = appDelegate.userInfo 
+		self.userInfo = appDelegate.userInfo
+
+		self.searching = false
     }
     
 
@@ -81,6 +83,8 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
 		if (!self.validateSearch()){
 			self.lblNotFound.isHidden = false
 			self.searching = false
+			self.searchItems.removeAll()
+			self.tableResult.reloadData()
 			print("Invalid input search")
 			return
 		}

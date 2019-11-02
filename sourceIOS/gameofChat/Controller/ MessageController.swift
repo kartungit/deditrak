@@ -98,27 +98,6 @@ class MessageController: UITableViewController {
 		}
 	}
 
-	func bindingItemFrom(snapshot : DataSnapshot) -> Item? {
-		if let dictionary = snapshot.value as? [String: Any] {
-			let item = Item()
-			item.itemId = dictionary["itemId"] as? String
-			item.toId = dictionary["toId"] as? String
-			item.fromId = dictionary["fromId"] as? String
-			item.title = dictionary["title"] as? String
-			item.category = dictionary["category"] as? String
-			item.fromOffice = dictionary["fromOffice"] as? String
-			item.toOffice = dictionary["toOffice"] as? String
-			item.quantity = dictionary["quantity"] as? String
-			item.reciever = dictionary["reciever"] as? String
-			item.sender = dictionary["sender"] as? String
-			item.status = dictionary["status"] as? String
-			item.timestamp = dictionary["timestamp"] as? NSNumber
-			return item
-		}
-		return nil
-	}
-
-
 	func bindingUserFrom(snapshot: DataSnapshot) -> User? {
 		let user = User(id: "")
 		if let dictionary = snapshot.value as? [String: Any] {
@@ -197,16 +176,16 @@ class MessageController: UITableViewController {
 			return ""
 		}
 		switch currentStatus {
-		case "New":
-			return "In Progress"
-		case "In Progress":
-			return "Recieved"
-		case "Recieved":
-			return "Deliveried"
-		case "Deliveried":
-			return "New"
+		case Common.STATUS_NEW:
+			return Common.STATUS_INPROGRESS
+		case Common.STATUS_INPROGRESS:
+			return Common.STATUS_RECEIVED
+		case Common.STATUS_RECEIVED:
+			return Common.STATUS_DELIVERIED
+		case Common.STATUS_DELIVERIED:
+			return Common.STATUS_NEW
 		default:
-			return "New"
+			return Common.STATUS_NEW
 		}
 	}
 

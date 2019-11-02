@@ -179,9 +179,7 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
 
 	// With Alamofire
 	func search() {
-		// wifi: zongmnt
-		let api_ip_api_search = "http://192.168.8.101:8080/items/search"
-		guard let url = URL(string: api_ip_api_search) else {
+		guard let url = URL(string: Common.API_SEARCH) else {
 			// print("Can't connect to URL")
 			searching = false
 			showAlert(message: "Can't connect to api, please check your server again.")

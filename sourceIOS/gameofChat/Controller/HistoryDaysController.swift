@@ -101,26 +101,6 @@ class HistoryDaysController: UIViewController, UITableViewDataSource, UITableVie
 		}
 	}
 
-	func bindingItemFrom(snapshot : DataSnapshot) -> Item? {
-		if let dictionary = snapshot.value as? [String: Any] {
-			let item = Item()
-			item.itemId = dictionary["itemId"] as? String
-			item.toId = dictionary["toId"] as? String
-			item.fromId = dictionary["fromId"] as? String
-			item.title = dictionary["title"] as? String
-			item.category = dictionary["category"] as? String
-			item.fromOffice = dictionary["fromOffice"] as? String
-			item.toOffice = dictionary["toOffice"] as? String
-			item.quantity = dictionary["quantity"] as? String
-			item.reciever = dictionary["reciever"] as? String
-			item.sender = dictionary["sender"] as? String
-			item.status = dictionary["status"] as? String
-			item.timestamp = dictionary["timestamp"] as? NSNumber
-			return item
-		}
-		return nil
-	}
-
 	func observerUserMessages(){
 		if let uOffice = self.userInfo.office {
 			let ref = Database.database().reference().child("user-messages").child(uOffice)
@@ -129,7 +109,7 @@ class HistoryDaysController: UIViewController, UITableViewDataSource, UITableVie
 				let messageId = snapshot.key
 				let messageReference = Database.database().reference().child("messages").child(messageId)
 				messageReference.observeSingleEvent(of: .value, with: { (snapshot) in
-					if let item = self.bindingItemFrom(snapshot: snapshot){
+					if let item = Item.bindingItemFrom(snapshot: snapshot){
 						if item.timestamp != nil {
 
 							let calendar = Calendar.current

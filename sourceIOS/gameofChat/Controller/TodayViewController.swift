@@ -26,7 +26,10 @@ class TodayViewController: UIViewController,ItemProtocol,BadgeDelegate {
 	var deliBadgeNumber = 0
 
 	private lazy var viewControllers: [MessageController] = {
-		return [MessageController(with: "New", delegate: self, badge: self.newBadgeNumber),MessageController(with: "In Progress", delegate: self, badge: self.inprogressBadgeNumber),MessageController(with: "Recieved", delegate: self, badge: self.receiBadgeNumber),MessageController(with: "Deliveried", delegate: self, badge: self.deliBadgeNumber)]
+		return [MessageController(with: Common.STATUS_NEW, delegate: self, badge: self.newBadgeNumber),
+				MessageController(with: Common.STATUS_INPROGRESS, delegate: self, badge: self.inprogressBadgeNumber),
+				MessageController(with: Common.STATUS_RECEIVED, delegate: self, badge: self.receiBadgeNumber),
+				MessageController(with: Common.STATUS_DELIVERIED, delegate: self, badge: self.deliBadgeNumber)]
 	}()
 
 	private func segmentioContent() -> [SegmentioItem] {

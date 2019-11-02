@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import FirebaseDatabase
 
 class Item: NSObject {
 	var itemId: String?
@@ -37,5 +38,30 @@ class Item: NSObject {
 		item.sender = "Nga"
 		item.status = "New"
 		return item
+	}
+
+	static func bindingItemFrom(snapshot : DataSnapshot) -> Item? {
+		if let dictionary = snapshot.value as? [String: Any] {
+			return bindingItemFromDictionary(dictionary: dictionary)
+		}
+		return nil
+	}
+
+	static func bindingItemFromDictionary(dictionary : [String: Any]) -> Item? {
+			let item = Item()
+			item.itemId = dictionary["itemId"] as? String
+			item.toId = dictionary["toId"] as? String
+			item.fromId = dictionary["fromId"] as? String
+			item.title = dictionary["title"] as? String
+			item.category = dictionary["category"] as? String
+			item.fromOffice = dictionary["fromOffice"] as? String
+			item.toOffice = dictionary["toOffice"] as? String
+			item.quantity = dictionary["quantity"] as? String
+			item.reciever = dictionary["reciever"] as? String
+			item.sender = dictionary["sender"] as? String
+			item.status = dictionary["status"] as? String
+			item.timestamp = dictionary["timestamp"] as? NSNumber
+			return item
+
 	}
 }

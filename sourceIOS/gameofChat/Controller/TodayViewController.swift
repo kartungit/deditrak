@@ -93,7 +93,6 @@ class TodayViewController: UIViewController,ItemProtocol,BadgeDelegate {
 		let chatLogController = ChatLogController(collectionViewLayout: UICollectionViewFlowLayout())
 		chatLogController.user = user
 		self.tabBarController?.navigationController?.pushViewController(chatLogController, animated: true)
-		
 	}
 
 	func removeBadgeAt(index: Int){

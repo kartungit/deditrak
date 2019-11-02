@@ -61,7 +61,7 @@ class MessageController: UITableViewController {
 		// Observe the item changed
 		messageReference.observe(.childChanged) { (snapshot) in
 			let itemId = snapshot.key
-			if let item = self.bindingItemFrom(snapshot: snapshot){
+			if let item = Item.bindingItemFrom(snapshot: snapshot){
 				if let index = self.message.firstIndex (where: {$0.itemId == itemId}) {
 					 if (item.status != self.baseStatus) {
 						// edit status item, remove item at current status
@@ -137,6 +137,7 @@ class MessageController: UITableViewController {
 		return nil
 	}
 
+
 	func bindingUserFrom(snapshot: DataSnapshot) -> User? {
 		let user = User(id: "")
 		if let dictionary = snapshot.value as? [String: Any] {
@@ -156,7 +157,7 @@ class MessageController: UITableViewController {
 				let messageId = snapshot.key
 				let messageReference = Database.database().reference().child("messages").child(messageId)
 				messageReference.observeSingleEvent(of: .value, with: { (snapshot) in
-					if let item = self.bindingItemFrom(snapshot: snapshot){
+					if let item = Item.bindingItemFrom(snapshot: snapshot){
 						if item.timestamp != nil {
 							if self.baseStatus == item.status {
 								self.message.append(item)

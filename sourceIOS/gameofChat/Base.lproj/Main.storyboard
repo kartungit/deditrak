@@ -304,6 +304,7 @@
                         <outlet property="btnToOffice" destination="OPl-0G-Lkw" id="hOb-D0-LNA"/>
                         <outlet property="lblNotFound" destination="Nop-TF-7Me" id="fHx-dN-JZD"/>
                         <outlet property="tableResult" destination="jBO-UG-R8n" id="ahb-Ew-CAR"/>
+                        <outlet property="textInputSearch" destination="lR7-5k-6z7" id="c6a-t7-td4"/>
                         <outlet property="textReceiver" destination="HLD-ZZ-WI1" id="bny-W8-ljS"/>
                         <outlet property="textSender" destination="eql-OK-6JD" id="0Pc-lE-gaQ"/>
                     </connections>

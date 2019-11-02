@@ -54,7 +54,7 @@ class MessageController: UITableViewController {
 		messageReference.observe(.childChanged) { (snapshot) in
 
 			let itemId = snapshot.key
-			if let item = self.bindingItemFrom(snapshot: snapshot){
+			if let item = Item.bindingItemFrom(snapshot: snapshot){
 				if let index = self.message.firstIndex (where: {$0.itemId == itemId}) {
 					self.message[index] = item
 				}
@@ -73,25 +73,25 @@ class MessageController: UITableViewController {
 		}
 	}
 
-	func bindingItemFrom(snapshot : DataSnapshot) -> Item? {
-		if let dictionary = snapshot.value as? [String: Any] {
-			let item = Item()
-			item.itemId = dictionary["itemId"] as? String
-			item.toId = dictionary["toId"] as? String
-			item.fromId = dictionary["fromId"] as? String
-			item.title = dictionary["title"] as? String
-			item.category = dictionary["category"] as? String
-			item.fromOffice = dictionary["fromOffice"] as? String
-			item.toOffice = dictionary["toOffice"] as? String
-			item.quantity = dictionary["quantity"] as? String
-			item.reciever = dictionary["reciever"] as? String
-			item.sender = dictionary["sender"] as? String
-			item.status = dictionary["status"] as? String
-			item.timestamp = dictionary["timestamp"] as? NSNumber
-			return item
-		}
-		return nil
-	}
+//	func bindingItemFrom(snapshot : DataSnapshot) -> Item? {
+//		if let dictionary = snapshot.value as? [String: Any] {
+//			let item = Item()
+//			item.itemId = dictionary["itemId"] as? String
+//			item.toId = dictionary["toId"] as? String
+//			item.fromId = dictionary["fromId"] as? String
+//			item.title = dictionary["title"] as? String
+//			item.category = dictionary["category"] as? String
+//			item.fromOffice = dictionary["fromOffice"] as? String
+//			item.toOffice = dictionary["toOffice"] as? String
+//			item.quantity = dictionary["quantity"] as? String
+//			item.reciever = dictionary["reciever"] as? String
+//			item.sender = dictionary["sender"] as? String
+//			item.status = dictionary["status"] as? String
+//			item.timestamp = dictionary["timestamp"] as? NSNumber
+//			return item
+//		}
+//		return nil
+//	}
 
 	func bindingUserFrom(snapshot: DataSnapshot) -> User? {
 		let user = User()
@@ -112,7 +112,7 @@ class MessageController: UITableViewController {
 				let messageId = snapshot.key
 				let messageReference = Database.database().reference().child("messages").child(messageId)
 				messageReference.observeSingleEvent(of: .value, with: { (snapshot) in
-					if let item = self.bindingItemFrom(snapshot: snapshot){
+					if let item = Item.bindingItemFrom(snapshot: snapshot){
 						if item.timestamp != nil {
 							if self.baseStatus == item.status {
 								self.message.append(item)

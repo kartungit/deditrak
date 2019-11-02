@@ -14,6 +14,7 @@ import Alamofire
 // https://github.com/apasccon/SearchTextField
 
 class SearchController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+	@IBOutlet weak var textInputSearch: UITextField!
 	@IBOutlet weak var btnCategory: UIButton!
 	@IBOutlet weak var btnFromOffice: UIButton!
 	@IBOutlet weak var btnToOffice: UIButton!
@@ -77,6 +78,13 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
 	}
 
 	@IBAction func searchAction(_ sender: Any) {
+		if (!self.validateSearch()){
+			self.lblNotFound.isHidden = false
+			self.searching = false
+			print("Invalid input search")
+			return
+		}
+
 		search()
 	}
 	
@@ -118,6 +126,34 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
 		button.show()
 	}
 
+	func validateSearch() -> Bool{
+		if (textInputSearch.text!.count > 0){
+			return true
+		}
+
+		if (btnCategory.titleLabel?.text != self.emptyText){
+			return true
+		}
+
+		if (btnFromOffice.titleLabel?.text != self.emptyText){
+			return true
+		}
+
+		if (btnToOffice.titleLabel?.text != self.emptyText){
+			return true
+		}
+
+		if (textSender.text != ""){
+			return true
+		}
+
+		if (textReceiver.text != ""){
+			return true
+		}
+
+		return false
+	}
+
 	func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
 		return UITableView.automaticDimension
 	}
@@ -143,8 +179,11 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
 
 	// With Alamofire
 	func search() {
-		guard let url = URL(string: "http://192.168.100.130:8080/users/all") else {
+		// wifi: zongmnt
+		let api_ip_api_search = "http://192.168.8.101:8080/items/search"
+		guard let url = URL(string: api_ip_api_search) else {
 			// print("Can't connect to URL")
+			searching = false
 			showAlert(message: "Can't connect to api, please check your server again.")
 			return
 		}
@@ -157,26 +196,60 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
 		// turnon flat search
 		searching = true
 
-		AF.request(url, method: .get, parameters: ["title": "DiDeTrak"])
+		var inputText = ""
+		var categoryText = ""
+		var fromOffice = ""
+		var toOffice = ""
+		var sendnder = ""
+		var receiver = ""
+
+		if (textInputSearch.text!.count > 0){
+			inputText = textInputSearch.text!
+		}
+
+		if (btnCategory.titleLabel?.text != self.emptyText){
+			categoryText = btnCategory.titleLabel!.text!
+		}
+
+		if (btnFromOffice.titleLabel?.text != self.emptyText){
+			fromOffice = (btnFromOffice.titleLabel?.text!)!
+		}
+
+		if (btnToOffice.titleLabel?.text != self.emptyText){
+			toOffice = (btnToOffice.titleLabel?.text!)!
+		}
+
+		if (textSender.text != ""){
+			sendnder = textSender.text!
+		}
+
+		if (textReceiver.text != ""){
+			receiver = textReceiver.text!
+		}
+
+		self.lblNotFound.isHidden = true
+
+		AF.request(url, method: .get, parameters: ["title": inputText.lowercased().trimmingCharacters(in: .whitespaces),
+												   "category": categoryText.lowercased().trimmingCharacters(in: .whitespaces),
+												   "fromOffice": fromOffice.lowercased().trimmingCharacters(in: .whitespaces),
+												   "toOffice": toOffice.lowercased().trimmingCharacters(in: .whitespaces),
+												   "sender":sendnder.lowercased().trimmingCharacters(in: .whitespaces),
+												   "receiver":receiver.lowercased().trimmingCharacters(in: .whitespaces)])
 			.validate()
 			.responseJSON { (response: DataResponse) in
-				print("API DONE")
+				//print("API DONE")
 				self.searchItems.removeAll()
-
-				if let status = response.response?.statusCode {
-					if status != 200 {
-						DispatchQueue.main.async {
-							self.showAlert(message: "Please check your server again.")
-						}
-						// reset flat searching
-						self.searching = false
-						return
-					}
-				}
 
 				switch response.result {
 				case .success(let json):
-					print(json)
+					if let jsonArray = json as? [[String: Any]] {
+						//print(jsonArray)
+						for (jsonitem) in jsonArray {
+							//print("\(jsonitem)")
+							let item = Item.bindingItemFromDictionary(dictionary: jsonitem)
+							self.searchItems.append(item!)
+						}
+					}
 					break
 				case .failure(let error):
 					DispatchQueue.main.async {
@@ -185,17 +258,21 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
 					break
 				}
 
-				self.searchItems.append(Item.createTestItem())
-				self.searchItems.append(Item.createTestItem())
-				self.searchItems.append(Item.createTestItem())
-				self.searchItems.append(Item.createTestItem())
-				self.searchItems.append(Item.createTestItem())
-				self.searchItems.append(Item.createTestItem())
+				// test items
+//				self.searchItems.append(Item.createTestItem())
+//				self.searchItems.append(Item.createTestItem())
+//				self.searchItems.append(Item.createTestItem())
+//				self.searchItems.append(Item.createTestItem())
+//				self.searchItems.append(Item.createTestItem())
+//				self.searchItems.append(Item.createTestItem())
 
 				// reset flat searching
 				self.searching = false
 
 				DispatchQueue.main.async {
+					if (self.searchItems.count == 0){
+						self.lblNotFound.isHidden = false
+					}
 					self.tableResult.reloadData()
 				}
 		}

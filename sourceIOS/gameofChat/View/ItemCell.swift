@@ -30,7 +30,7 @@ class ItemCell: UITableViewCell {
 			statusLabel.textColor = getStatusColor(status: item.status)
 			renderOfficeLable(label: fromOfficeLabel, text: item.fromOffice!)
 			renderOfficeLable(label: toOfficeLabel, text: item.toOffice!)
-			senderRecieverLabel.text = "\(String(describing: item.sender!)) to \(String(describing: item.reciever!))"
+			senderRecieverLabel.text = "\(String(describing: item.sender? = "")) to \(String(describing: item.reciever? = ""))"
 		}
 	}
 	var user: User? {

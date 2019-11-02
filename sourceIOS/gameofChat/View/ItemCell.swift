@@ -37,7 +37,7 @@ class ItemCell: UITableViewCell {
 			guard let itemData = item, let userData = user else {
 				return
 			}
-			hideNext = (userData.office == itemData.fromOffice && (itemData.status == "In Progress" || itemData.status == "Recieved")) || itemData.status == "Deliveried"
+			hideNext = (userData.office == itemData.fromOffice && (itemData.status == "In Progress" || itemData.status == "Recieved")) || itemData.status == "Deliveried" || (userData.office != itemData.fromOffice && itemData.status == "New")
 		}
 	}
 	var hideNext = false

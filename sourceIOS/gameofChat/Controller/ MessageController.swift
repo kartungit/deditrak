@@ -13,6 +13,10 @@ import FirebaseDatabase
 protocol ItemProtocol {
 	func createNewItem(user: User?)
 }
+
+protocol BadgeDelegate {
+	func updateBadgeValue(segIndex: Int, value: Int)
+}
 class MessageController: UITableViewController {
 
 
@@ -22,9 +26,12 @@ class MessageController: UITableViewController {
 	var userInfo: User!
 	var positionView = 0
 	var baseStatus: String?
+	var delegate : BadgeDelegate?
+	var currentBadge = 0
 
-	init(with status: String) {
+	init(with status: String,delegate: BadgeDelegate) {
 		self.baseStatus = status
+		self.delegate = delegate
 		super.init(nibName: nil, bundle: nil)
 	}
 
@@ -37,6 +44,7 @@ class MessageController: UITableViewController {
 
 		tableView.register(ItemCell.self, forCellReuseIdentifier: cellId)
 		observeMessages()
+		getCurrentBadgeNumber()
 	}
 
 	override func viewDidAppear(_ animated: Bool) {
@@ -52,7 +60,6 @@ class MessageController: UITableViewController {
 
 		// Observe the item changed
 		messageReference.observe(.childChanged) { (snapshot) in
-
 			let itemId = snapshot.key
 			if let item = self.bindingItemFrom(snapshot: snapshot){
 				if let index = self.message.firstIndex (where: {$0.itemId == itemId}) {
@@ -67,6 +74,10 @@ class MessageController: UITableViewController {
 				if (item.status == self.baseStatus) {
 					// edit status item, add item to next status
 					self.message.append(item)
+					if (self.baseStatus != "New") {
+						self.currentBadge = self.currentBadge+1
+						self.delegate?.updateBadgeValue(segIndex: self.positionView, value: self.currentBadge)
+					}
 					self.message.sort(by: { (message1, message2) -> Bool in
 						return message1.timestamp!.intValue > message2.timestamp!.intValue
 					})
@@ -86,6 +97,26 @@ class MessageController: UITableViewController {
 		}
 	}
 
+	func getCurrentBadgeNumber() {
+		let decoded  = UserDefaults.standard.data(forKey: "userData")
+		let userData = NSKeyedUnarchiver.unarchiveObject(with: decoded!) as! User
+		switch positionView {
+		case 0:
+			currentBadge = Int(userData.unseenNew!) ?? 0
+			return
+		case 1:
+			currentBadge = Int(userData.unseenInProgress!) ?? 0
+			return
+		case 2:
+			currentBadge = Int(userData.unseenRecieved!) ?? 0
+			return
+		case 3:
+			currentBadge = Int(userData.unseenDeliveried!) ?? 0
+			return
+		default:
+			return
+		}
+	}
 	func bindingItemFrom(snapshot : DataSnapshot) -> Item? {
 		if let dictionary = snapshot.value as? [String: Any] {
 			let item = Item()
@@ -107,7 +138,7 @@ class MessageController: UITableViewController {
 	}
 
 	func bindingUserFrom(snapshot: DataSnapshot) -> User? {
-		let user = User()
+		let user = User(id: "")
 		if let dictionary = snapshot.value as? [String: Any] {
 			user.office = dictionary["office"] as? String
 			user.id = dictionary["id"] as? String
@@ -229,15 +260,13 @@ class MessageController: UITableViewController {
 	}
 
 	fileprivate func fetchUserAndSetupNavbarTitle() {
-		let uid = Auth.auth().currentUser?.uid
-		Database.database().reference().child("users").child(uid!).observeSingleEvent(of: .value) { (snapshot) in
-			if let user = User.bindingUserFrom(snapshot: snapshot){
-				let appDelegate = UIApplication.shared.delegate as! AppDelegate
-				appDelegate.userInfo = user
-				
-				self.setupNavigationTitleView(user: user)
-			}
+		let decoded  = UserDefaults.standard.data(forKey: "userData")
+		let userData = NSKeyedUnarchiver.unarchiveObject(with: decoded!) as! User
+		if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
+			appDelegate.userInfo = userData
 		}
+		self.setupNavigationTitleView(user: userData)
+
 	}
 
 	func checkIfUserLoggedIn(){

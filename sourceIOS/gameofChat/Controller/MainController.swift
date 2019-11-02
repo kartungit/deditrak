@@ -10,6 +10,7 @@ import UIKit
 import Firebase
 import FirebaseDatabase
 
+
 class MainController: UITabBarController {
 
     override func viewDidLoad() {
@@ -65,22 +66,33 @@ class MainController: UITabBarController {
 		nameLabel.heightAnchor.constraint(equalTo: titleView.heightAnchor).isActive = true
 		self.navigationItem.titleView = titleView
 	}
-	fileprivate func fetchUserAndSetupNavbarTitle() {
-		let uid = Auth.auth().currentUser?.uid
-		Database.database().reference().child("users").child(uid!).observeSingleEvent(of: .value) { (snapshot) in
+	fileprivate func fetchUserAndSetupNavbarTitle(uid : String) {
+		let ref = Database.database().reference().child("users").child(uid).observeSingleEvent(of: .value) { (snapshot) in
 			if let dictionary = snapshot.value as? [String : Any] {
+				var user : User?
+				if let bindingUser = User.bindingUserFrom(snapshot: snapshot) {
+					bindingUser.id = snapshot.key
+					user = bindingUser
+					let encodedData: Data = NSKeyedArchiver.archivedData(withRootObject: user)
+					UserDefaults.standard.set(encodedData, forKey: "userData")
+					UserDefaults.standard.synchronize()
+
+					UserDefaults.standard.set(uid, forKey: "authUID")
+					self.setupTabBarItems()
+				}
+
 				self.setupNavigationTitleView(dictionary)
 			}
 		}
-		setupTabBarItems()
 	}
 	func checkIfUserLoggedIn(){
 		//user is not logged in
-		if Auth.auth().currentUser?.uid == nil {
+		guard let uid = Auth.auth().currentUser?.uid else {
 			perform(#selector(handleLogout), with: nil, afterDelay: 0)
-		} else {
-			fetchUserAndSetupNavbarTitle()
+			return
 		}
+		fetchUserAndSetupNavbarTitle(uid : uid)
+
 	}
 	@objc func handleLogout(){
 

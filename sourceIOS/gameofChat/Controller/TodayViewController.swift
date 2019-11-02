@@ -9,15 +9,19 @@
 import UIKit
 import Segmentio
 
-class TodayViewController: UIViewController,ItemProtocol {
+class TodayViewController: UIViewController,ItemProtocol,BadgeDelegate {
 
 	lazy var  segmentioView = Segmentio()
 	lazy var  containerView = UIView()
 	lazy var  scrollView = UIScrollView()
-	var currentTab = 0
+	var currentTab = 0 {
+		didSet {
+			removeBadgeAt(index: currentTab)
+		}
+	}
 
 	private lazy var viewControllers: [MessageController] = {
-		return [MessageController(with: "New"),MessageController(with: "In Progress"),MessageController(with: "Recieved"),MessageController(with: "Deliveried")]
+		return [MessageController(with: "New", delegate: self),MessageController(with: "In Progress", delegate: self),MessageController(with: "Recieved", delegate: self),MessageController(with: "Deliveried", delegate: self)]
 	}()
 
 	private func segmentioContent() -> [SegmentioItem] {
@@ -58,19 +62,19 @@ class TodayViewController: UIViewController,ItemProtocol {
 		segmentioView.valueDidChange = { [weak self] _, segmentIndex in
 			if let scrollViewWidth = self?.scrollView.frame.width {
 				let contentOffsetX = scrollViewWidth * CGFloat(segmentIndex)
+				self?.currentTab = segmentIndex
 				self?.scrollView.setContentOffset(
 					CGPoint(x: contentOffsetX, y: 0),
 					animated: true
 				)
 			}
 		}
-		segmentioView.selectedSegmentioIndex = self.currentTab
+		segmentioView.selectedSegmentioIndex = self.selectedSegmentioIndex()
 
 
 	}
 	override func viewDidAppear(_ animated: Bool) {
 		super .viewDidAppear(animated)
-
 
 	}
 
@@ -79,7 +83,7 @@ class TodayViewController: UIViewController,ItemProtocol {
 	}
 
 	private func selectedSegmentioIndex() -> Int {
-		return 0
+		return self.currentTab
 	}
 	@objc func handleNewItem(){
 		createNewItem(user: nil)
@@ -92,6 +96,42 @@ class TodayViewController: UIViewController,ItemProtocol {
 		
 	}
 
+	func removeBadgeAt(index: Int){
+		segmentioView.removeBadge(at: index)
+	}
+
+	func updateBadgeValue(segIndex: Int, value: Int){
+		
+		segmentioView.addBadge(
+			at: segIndex,
+			count: value,
+			color: ColorPalette.coral
+		)
+		updateUnSeenNumber(segIndex: segIndex, value: value)
+	}
+	func updateUnSeenNumber(segIndex: Int, value: Int){
+		let decoded  = UserDefaults.standard.data(forKey: "userData")
+		let userData = NSKeyedUnarchiver.unarchiveObject(with: decoded!) as! User
+		switch segIndex {
+		case 0:
+			userData.unseenNew = String(value)
+			break
+		case 1:
+			userData.unseenInProgress = String(value)
+			break
+		case 2:
+			userData.unseenRecieved = String(value)
+			break
+		case 3:
+			userData.unseenDeliveried = String(value)
+			break
+		default:
+			break
+		}
+		let encodedData: Data = NSKeyedArchiver.archivedData(withRootObject: userData)
+		UserDefaults.standard.set(encodedData, forKey: "userData")
+		UserDefaults.standard.synchronize()
+	}
 	func setupSegmentsViewConstraints(){
 
 		self.view.addSubview(segmentioView)

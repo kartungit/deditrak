@@ -24,10 +24,6 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
 	@IBOutlet weak var lblNotFound: UILabel!
 	@IBOutlet weak var tableResult: UITableView!
 
-	let emptyText : String = "---"
-	let username = ["Ngà", "Thịnh", "Huy", "Đại", "Anh", "Trang", "Tường", "Lâm", "Ngọc", "Đức", "Chung", "Dương", "Khánh", "Tuấn", "Hợi", "Thiện", "Toàn", "Ngân", "Nga", "Ngọc", "Lam", ]
-	let categorys = ["---", "Paper", "Books", "Devices"]
-	let offices = ["---", "CH", "TS", "TV", "US"]
 	let cellId = "cellId"
 
 	var searching : Bool = false
@@ -38,13 +34,13 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-		btnCategory.setTitle(emptyText, for: .normal)
-		btnFromOffice.setTitle(emptyText, for: .normal)
-		btnToOffice.setTitle(emptyText, for: .normal)
+		btnCategory.setTitle(Common.emptyText, for: .normal)
+		btnFromOffice.setTitle(Common.emptyText, for: .normal)
+		btnToOffice.setTitle(Common.emptyText, for: .normal)
 
 		// Set the array of strings you want to suggest
-		textSender.filterStrings(username)
-		textReceiver.filterStrings(username)
+		textSender.filterStrings(Common.username)
+		textReceiver.filterStrings(Common.username)
 
 		tableResult.dataSource = self
 		tableResult.delegate = self
@@ -95,7 +91,7 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
 	@objc func adjustCategory(){
 		let button = DropDown()
 		button.anchorView = self.btnCategory
-		button.dataSource = self.categorys
+		button.dataSource = Common.categorys
 		button.selectionAction = { [unowned self] (index: Int, item: String) in
 			DispatchQueue.main.async {
 				self.btnCategory.setTitle(item, for: .normal)
@@ -108,7 +104,7 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
 	@objc func adjustOfficeSend(){
 		let button = DropDown()
 		button.anchorView = self.btnFromOffice
-		button.dataSource = self.offices
+		button.dataSource = Common.offices
 		button.selectionAction = { [unowned self] (index: Int, item: String) in
 			DispatchQueue.main.async {
 				self.btnFromOffice.setTitle(item, for: .normal)
@@ -120,7 +116,7 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
 	@objc func adjustOfficeRecieve(){
 		let button = DropDown()
 		button.anchorView = self.btnToOffice
-		button.dataSource = self.offices
+		button.dataSource = Common.offices
 		button.selectionAction = { [unowned self] (index: Int, item: String) in
 			DispatchQueue.main.async {
 				self.btnToOffice.setTitle(item, for: .normal)
@@ -135,15 +131,15 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
 			return true
 		}
 
-		if (btnCategory.titleLabel?.text != self.emptyText){
+		if (btnCategory.titleLabel?.text != Common.emptyText){
 			return true
 		}
 
-		if (btnFromOffice.titleLabel?.text != self.emptyText){
+		if (btnFromOffice.titleLabel?.text != Common.emptyText){
 			return true
 		}
 
-		if (btnToOffice.titleLabel?.text != self.emptyText){
+		if (btnToOffice.titleLabel?.text != Common.emptyText){
 			return true
 		}
 
@@ -211,15 +207,15 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
 			inputText = textInputSearch.text!
 		}
 
-		if (btnCategory.titleLabel?.text != self.emptyText){
+		if (btnCategory.titleLabel?.text != Common.emptyText){
 			categoryText = btnCategory.titleLabel!.text!
 		}
 
-		if (btnFromOffice.titleLabel?.text != self.emptyText){
+		if (btnFromOffice.titleLabel?.text != Common.emptyText){
 			fromOffice = (btnFromOffice.titleLabel?.text!)!
 		}
 
-		if (btnToOffice.titleLabel?.text != self.emptyText){
+		if (btnToOffice.titleLabel?.text != Common.emptyText){
 			toOffice = (btnToOffice.titleLabel?.text!)!
 		}
 

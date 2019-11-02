@@ -324,8 +324,10 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 
 	@objc func adjustOfficeRecieve(){
 		let button = DropDown()
+		var source = ["CH", "TS", "TV", "US"].filter { $0 != self.user?.office }
+//		source.removeAll(where: $0 == self.user?.office)
 		button.anchorView = self.toOfficeButton
-		button.dataSource = ["CH", "TS", "TV", "US"]
+		button.dataSource = source as! [String]
 		button.selectionAction = { [unowned self] (index: Int, item: String) in
 			DispatchQueue.main.async {
 				self.toOfficeButton.setTitle(item, for: .normal)

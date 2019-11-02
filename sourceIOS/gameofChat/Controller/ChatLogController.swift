@@ -37,7 +37,7 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 	lazy var inputTextField: UITextField = {
 		let textField = UITextField()
 		textField.placeholder = "Enter title..."
-		textField.borderStyle = UITextField.BorderStyle.bezel
+		textField.borderStyle = UITextField.BorderStyle.roundedRect
 		textField.addTarget(self, action: #selector(validationInput), for: UIControl.Event.editingChanged)
 		textField.translatesAutoresizingMaskIntoConstraints = false
 		textField.delegate = self
@@ -48,6 +48,7 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 	lazy var categoryButton : UIButton = {
 		let button = UIButton()
 		button.backgroundColor = UIColor(r: 136, g: 187, b: 233)
+		button.layer.cornerRadius = 10
 		button.setTitle("Category", for: .normal)
 		button.addTarget(self, action: #selector(adjustCategory), for: .touchUpInside)
 		button.translatesAutoresizingMaskIntoConstraints = false
@@ -58,7 +59,7 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 	lazy var quantityTextField: UITextField = {
 		let textField = UITextField()
 		textField.placeholder = "Enter quantity..."
-		textField.borderStyle = UITextField.BorderStyle.bezel
+		textField.borderStyle = UITextField.BorderStyle.roundedRect
 		textField.addTarget(self, action: #selector(validationInput), for: UIControl.Event.editingChanged)
 		textField.translatesAutoresizingMaskIntoConstraints = false
 		textField.delegate = self
@@ -70,6 +71,7 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 	lazy var fromOfficeButton : UIButton = {
 		let button = UIButton()
 		button.backgroundColor = UIColor(r: 136, g: 187, b: 233)
+		button.layer.cornerRadius = 10
 		button.setTitle("From office", for: .normal)
 //		button.addTarget(self, action: #selector(adjustOfficeSend), for: .touchUpInside)
 		button.translatesAutoresizingMaskIntoConstraints = false
@@ -79,6 +81,7 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 	lazy var toOfficeButton : UIButton = {
 		let button = UIButton()
 		button.backgroundColor = UIColor(r: 136, g: 187, b: 233)
+		button.layer.cornerRadius = 10
 		button.setTitle("To office", for: .normal)
 		button.addTarget(self, action: #selector(adjustOfficeRecieve), for: .touchUpInside)
 		button.translatesAutoresizingMaskIntoConstraints = false
@@ -89,7 +92,7 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 	lazy var senderTextField: SearchTextField = {
 		let textField = SearchTextField()
 		textField.placeholder = "Sender"
-		textField.borderStyle = UITextField.BorderStyle.bezel
+		textField.borderStyle = UITextField.BorderStyle.roundedRect
 		textField.addTarget(self, action: #selector(validationInput), for: UIControl.Event.editingChanged)
 		textField.translatesAutoresizingMaskIntoConstraints = false
 		textField.delegate = self
@@ -101,7 +104,7 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 	lazy var recieverTextField: SearchTextField = {
 		let textField = SearchTextField()
 		textField.placeholder = "Reciever"
-		textField.borderStyle = UITextField.BorderStyle.bezel
+		textField.borderStyle = UITextField.BorderStyle.roundedRect
 		textField.addTarget(self, action: #selector(validationInput), for: UIControl.Event.editingChanged)
 		textField.translatesAutoresizingMaskIntoConstraints = false
 		textField.delegate = self
@@ -410,10 +413,11 @@ class ChatLogController : UICollectionViewController, UITextFieldDelegate {
 			}
 			else{
 				// update
-				// self!.navigationController?.popViewController(animated: true)
 				// call api create Update ITEM
 				self?.updateItem(parameters: value)
 			}
+			 self!.navigationController?.popViewController(animated: true)
+
 		}
 	}
 

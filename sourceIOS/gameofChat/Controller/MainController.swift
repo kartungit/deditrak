@@ -66,7 +66,27 @@ class MainController: UITabBarController,loginDelegate {
 		nameLabel.centerYAnchor.constraint(equalTo: titleView.centerYAnchor).isActive = true
 		nameLabel.leftAnchor.constraint(equalTo: titleView.leftAnchor).isActive = true
 		nameLabel.heightAnchor.constraint(equalTo: titleView.heightAnchor).isActive = true
-		self.navigationItem.titleView = titleView
+
+        self.navigationItem.titleView = titleView
+
+		let rightButtonView = UIView()
+		rightButtonView.frame = CGRect(x: 0, y: 0, width: 80, height: 40)
+		let rightLabel = UILabel()
+		rightLabel.text = "DeDiTrak"
+		rightLabel.textColor = UIColor.black
+		rightLabel.font = UIFont(name: "Verdana", size: 20)
+
+		rightButtonView.addSubview(rightLabel)
+
+		rightLabel.translatesAutoresizingMaskIntoConstraints = false
+		// auto layout
+		rightLabel.centerXAnchor.constraint(equalTo: rightButtonView.centerXAnchor).isActive = true
+		rightLabel.centerYAnchor.constraint(equalTo: rightButtonView.centerYAnchor).isActive = true
+		rightLabel.leftAnchor.constraint(equalTo: rightButtonView.leftAnchor).isActive = true
+		rightLabel.heightAnchor.constraint(equalTo: rightButtonView.heightAnchor).isActive = true
+		
+		self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: rightButtonView)
+
 	}
 	fileprivate func fetchUserAndSetupNavbarTitle(uid : String) {
 		let ref = Database.database().reference().child("users").child(uid).observeSingleEvent(of: .value) { (snapshot) in

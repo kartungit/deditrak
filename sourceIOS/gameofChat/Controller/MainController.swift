@@ -33,20 +33,20 @@ class MainController: UITabBarController {
 
 		let itemSearch = UITabBarItem()
 		itemSearch.title = "Search"
-		itemSearch.image = UIImage(named: "home_icon")
+		itemSearch.image = UIImage(named: "search_icon")
 		let searchVC:UIViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier:"SearchViewController") as UIViewController
 		searchVC.tabBarItem = itemSearch
 
 		let itemHistory = UITabBarItem()
 		itemHistory.title = "History"
-		itemHistory.image = UIImage(named: "home_icon")
+		itemHistory.image = UIImage(named: "history_icon")
 		let historyVC:UIViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier:"HistoryController") as UIViewController
 		historyVC.tabBarItem = itemHistory
 
 
 		let itemSetting = UITabBarItem()
 		itemSetting.title = "Setting"
-		itemSetting.image = UIImage(named: "home_icon")
+		itemSetting.image = UIImage(named: "settings_icon")
 		let settingVC = SettingController()
 		settingVC.tabBarItem = itemSetting
 

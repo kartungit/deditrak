@@ -45,7 +45,6 @@ class MessageController: UITableViewController {
 
 		tableView.register(ItemCell.self, forCellReuseIdentifier: cellId)
 		observeMessages()
-//		getCurrentBadgeNumber()
 	}
 
 	override func viewDidAppear(_ animated: Bool) {
@@ -162,7 +161,23 @@ class MessageController: UITableViewController {
 
 		editItem(item: cell.item, userInfo: self.userInfo)
 	}
+	override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+		let headerView = UIView()
+		headerView.backgroundColor = UIColor.lightGray
 
+		let headerLabel = UILabel(frame: CGRect(x: 30, y: 5, width:
+			tableView.bounds.size.width, height: tableView.bounds.size.height))
+		headerLabel.textColor = UIColor.black
+		headerLabel.text = "Total \(self.message.count) items"
+		headerLabel.sizeToFit()
+		headerView.addSubview(headerLabel)
+
+		return headerView
+	}
+
+	override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+		return 30
+	}
 	@objc func goToNextStep(sender: ButtonExtended){
 
 		if let item = sender.item {

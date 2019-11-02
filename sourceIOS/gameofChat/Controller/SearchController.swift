@@ -50,6 +50,9 @@ class SearchController: UIViewController, UITableViewDataSource, UITableViewDele
 		self.userInfo = appDelegate.userInfo
 
 		self.searching = false
+
+		let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
+		view.addGestureRecognizer(tap)
     }
     
 

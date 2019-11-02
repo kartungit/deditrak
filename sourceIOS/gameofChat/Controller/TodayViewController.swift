@@ -50,7 +50,12 @@ class TodayViewController: UIViewController,ItemProtocol,BadgeDelegate {
 		self.tabBarController?.navigationItem.rightBarButtonItem =  UIBarButtonItem(customView: rightButtonView)
 
 		view.backgroundColor = UIColor.white
-		
+		let decoded  = UserDefaults.standard.data(forKey: "userData")
+		let userData = NSKeyedUnarchiver.unarchiveObject(with: decoded!) as! User
+		newBadgeNumber = Int(userData.unseenNew!) ?? 0
+		inprogressBadgeNumber = Int(userData.unseenInProgress!) ?? 0
+		receiBadgeNumber = Int(userData.unseenRecieved!) ?? 0
+		deliBadgeNumber = Int(userData.unseenDeliveried!) ?? 0
 		setupSegmentsViewConstraints()
 
 		setupScrollView()
@@ -104,6 +109,9 @@ class TodayViewController: UIViewController,ItemProtocol,BadgeDelegate {
 
 	func removeBadgeAt(index: Int){
 		segmentioView.removeBadge(at: index)
+		viewControllers[index].currentBadge = 0
+		updateUnSeenNumber(segIndex: index, value: 0)
+
 	}
 
 	func updateBadgeValue(segIndex: Int, value: Int){
@@ -124,15 +132,9 @@ class TodayViewController: UIViewController,ItemProtocol,BadgeDelegate {
 	}
 
 	func reanderBadgeNumber(){
-		let decoded  = UserDefaults.standard.data(forKey: "userData")
-		let userData = NSKeyedUnarchiver.unarchiveObject(with: decoded!) as! User
-		newBadgeNumber = Int(userData.unseenNew!) ?? 0
 		addBadgeNumber(segIndex: 0, value: newBadgeNumber)
-		inprogressBadgeNumber = Int(userData.unseenInProgress!) ?? 0
 		addBadgeNumber(segIndex: 1, value: inprogressBadgeNumber)
-		receiBadgeNumber = Int(userData.unseenRecieved!) ?? 0
 		addBadgeNumber(segIndex: 2, value: receiBadgeNumber)
-		deliBadgeNumber = Int(userData.unseenDeliveried!) ?? 0
 		addBadgeNumber(segIndex: 3, value: deliBadgeNumber)
 	}
 

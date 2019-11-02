@@ -76,7 +76,7 @@ class MessageController: UITableViewController {
 					// edit status item, add item to next status
 					self.message.append(item)
 					if (self.baseStatus != "New") {
-						self.currentBadge = self.currentBadge+1
+						self.currentBadge = self.currentBadge + 1
 						self.delegate?.updateBadgeValue(segIndex: self.positionView, value: self.currentBadge)
 					}
 					self.message.sort(by: { (message1, message2) -> Bool in
